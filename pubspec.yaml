@@ -1,0 +1,36 @@
+name: gym_app_user_1
+description: "A new Flutter project."
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: ^3.8.1
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+  firebase_core: ^3.13.1
+  provider: ^6.1.5
+  google_fonts: ^6.2.1
+  firebase_auth: ^5.5.4
+  cloud_firestore: ^5.6.8
+  razorpay_flutter: ^1.4.0
+  flutterfire_cli: ^1.2.0
+  shared_preferences: ^2.2.3
+  cr_calendar: ^1.2.1
+  flutter_svg: ^2.1.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/
+    - assets/svg/
+    - assets/images/
+    - assets/svg/logo.svg
+

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "250513066006",
+    "project_id": "gym-meal-subscription",
+    "storage_bucket": "gym-meal-subscription.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:250513066006:android:45a24ce198bbf2475c8d37",
+        "android_client_info": {
+          "package_name": "com.example.gym_app_user_1"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBeHl8uVqUvLM-JBoRfhHstyhzJRIcPkhw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

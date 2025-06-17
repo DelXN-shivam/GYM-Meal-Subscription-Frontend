@@ -1,124 +1,97 @@
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:gym_app_user_1/services/local_storage_service.dart';
 
 class AuthProvider with ChangeNotifier {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  User? _user;
+  User? _firebaseUser;
+  Map<String, dynamic>? _backendUserData;
+  final LocalStorageService _localStorageService = LocalStorageService();
   bool _isLoading = false;
-  Map<String, dynamic>? _userData;
-
-  User? get user => _user;
-  bool get isLoading => _isLoading;
-  bool get isAuthenticated => _user != null;
-  Map<String, dynamic>? get userData => _userData;
 
   AuthProvider() {
-    _auth.authStateChanges().listen((User? user) {
-      _user = user;
-      fetchAndSetUserData(user);
-      notifyListeners();
-    });
+    initializeUser();
   }
 
-  Future<void> signUp({
-    required String email,
-    required String password,
-    required String name,
-    required int age,
-    required String gender,
-    required double height,
-    required double weight,
-    required String fitnessGoal,
-    required List<String> dietaryPreferences,
-    required List<String> allergies,
-  }) async {
+  // Getters
+  User? get firebaseUser => _firebaseUser;
+  Map<String, dynamic>? get backendUserData => _backendUserData;
+  bool get isLoading => _isLoading;
+  bool get isAuthenticated => _firebaseUser != null && _backendUserData != null;
+
+  // Initialize user data when app starts
+  Future<void> initializeUser() async {
+    setLoading(true);
     try {
-      _isLoading = true;
-      notifyListeners();
+      // Get current Firebase user
+      final currentUser = FirebaseAuth.instance.currentUser;
+      if (currentUser != null) {
+        _firebaseUser = currentUser;
 
-      final UserCredential userCredential = await _auth
-          .createUserWithEmailAndPassword(email: email, password: password);
+        final userData = await _getUserDataFromBackend(currentUser.uid);
+        _backendUserData = userData;
 
-      await _firestore.collection('users').doc(userCredential.user!.email).set({
-        'name': name,
-        'email': email,
-        'age': age,
-        'gender': gender,
-        'height': height,
-        'weight': weight,
-        'fitnessGoal': fitnessGoal,
-        'dietaryPreferences': dietaryPreferences,
-        'allergies': allergies,
-        'createdAt': FieldValue.serverTimestamp(),
-      });
-
-      _isLoading = false;
-      notifyListeners();
-    } catch (e) {
-      _isLoading = false;
-      notifyListeners();
-      rethrow;
-    }
-  }
-
-  Future<void> signIn({required String email, required String password}) async {
-    try {
-      _isLoading = true;
-      notifyListeners();
-
-      await _auth.signInWithEmailAndPassword(email: email, password: password);
-
-      await fetchAndSetUserData(_auth.currentUser);
-
-      _isLoading = false;
-      notifyListeners();
-    } catch (e) {
-      _isLoading = false;
-      notifyListeners();
-      rethrow;
-    }
-  }
-
-  Future<void> fetchAndSetUserData(User? user) async {
-    if (user == null || user.email == null) {
-      _userData = null;
-      notifyListeners();
-      return;
-    }
-    try {
-      final doc = await _firestore.collection('users').doc(user.email).get();
-      if (doc.exists) {
-        _userData = doc.data();
-      } else {
-        _userData = null;
-        print('User document not found for email: ${user.email}');
+        notifyListeners();
       }
-      notifyListeners();
     } catch (e) {
-      _userData = null;
-      print('Error fetching user data: $e');
-      notifyListeners();
-      rethrow;
+      print('Error initializing user: $e');
+    } finally {
+      setLoading(false);
     }
   }
 
-  Future<void> signOut() async {
-    try {
-      await _auth.signOut();
-      _userData = null;
-      notifyListeners();
-    } catch (e) {
-      rethrow;
-    }
+  Future<Map<String, dynamic>> _getUserDataFromBackend(String userId) async {
+    return {
+      'name': await _localStorageService.getUsername() ?? 'N/A',
+      'userId': userId,
+      'mongoId': await _localStorageService.getMongoId() ?? 'N/A',
+      'mongoEmail': await _localStorageService.getMongoEmail() ?? 'N/A',
+      // Add other user data fields
+    };
   }
 
-  Future<void> resetPassword(String email) async {
-    try {
-      await _auth.sendPasswordResetEmail(email: email);
-    } catch (e) {
-      rethrow;
-    }
+  // Set loading state
+  void setLoading(bool value) {
+    _isLoading = value;
+    notifyListeners();
+  }
+
+  // Set user data after successful login
+  Future<void> setUserData({
+    required User firebaseUser,
+    required Map<String, dynamic> backendUserData,
+  }) async {
+    _firebaseUser = firebaseUser;
+    _backendUserData = backendUserData;
+
+    // Log the backend user data for debugging
+    log("Backend User Data: $backendUserData");
+
+    // Save login data to local storage
+    await _localStorageService.saveLoginData(
+      userId: firebaseUser.uid,
+      username: backendUserData['name'] ?? '',
+      mongoId: backendUserData['id'] ?? '',
+      mongoEmail: backendUserData['email'] ?? '',
+    );
+
+    // Log the saved data for verification
+    log("Saved Mongo ID: ${await _localStorageService.getMongoId()}");
+    log("Saved Mongo Email: ${await _localStorageService.getMongoEmail()}");
+
+    notifyListeners();
+  }
+
+  // Clear user data on logout
+  Future<void> logout() async {
+    _firebaseUser = null;
+    _backendUserData = null;
+    await _localStorageService.clearLoginData();
+    notifyListeners();
+  }
+
+  // Check if user is logged in
+  Future<bool> checkLoginStatus() async {
+    return await _localStorageService.isLoggedIn();
   }
 }

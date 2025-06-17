@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:gym_app_user_1/config/routes.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter/services.dart';
+import 'package:gym_app_user_1/screens/auth/login_screen.dart';
 
 class SignupScreen extends StatefulWidget {
   @override
@@ -15,19 +19,20 @@ class _SignupScreenState extends State<SignupScreen> {
   TextEditingController weightController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController contactController = TextEditingController();
-
-  // Dropdown values
-  String? selectedGender;
-  String? selectedAddress = 'Home address';
-  // Separate toggles for each address
-  bool showHomeAddress = true;
-  bool showOfficeAddress = false;
-  bool showCollegeAddress = false;
-
   // Address controllers
   TextEditingController homeAddressController = TextEditingController();
   TextEditingController officeAddressController = TextEditingController();
   TextEditingController collegeAddressController = TextEditingController();
+
+  // Dropdown values
+  String? selectedGender;
+  bool isGenderDropdownExpanded = false;
+  String? selectedAddress = 'Home address';
+
+  // Separate toggles for each address
+  bool showHomeAddress = true;
+  bool showOfficeAddress = false;
+  bool showCollegeAddress = false;
 
   final List<String> genderOptions = ['Male', 'Female', 'Other'];
   final List<String> addressOptions = [
@@ -36,17 +41,54 @@ class _SignupScreenState extends State<SignupScreen> {
     'College address',
   ];
 
+  void clearFields() {
+    nameController.clear();
+    ageController.clear();
+    heightController.clear();
+    weightController.clear();
+    emailController.clear();
+    contactController.clear();
+    homeAddressController.clear();
+  }
+
+  void _handleSignup() {
+    // Show success message
+    _showSnackBar('Account created successfully!');
+
+    // Here you would typically:
+    // 1. Send data to your backend
+    // 2. Navigate to login or home screen
+    // 3. Store user data locally if needed
+
+    print('Signup Data:');
+    print('Name: ${nameController.text}');
+    print('Age: ${ageController.text}');
+    print('Gender: $selectedGender');
+    print('Height: ${heightController.text}');
+    print('Weight: ${weightController.text}');
+    print('Email: ${emailController.text}');
+    print('Contact: ${contactController.text}');
+    print('Home Address: ${homeAddressController.text}');
+    print('Office Address: ${officeAddressController.text}');
+    print('College Address: ${collegeAddressController.text}');
+    // clearFields();
+    Navigator.pushNamed(context, AppRoutes.setPreferences);
+  }
+
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Color(0xFF4ECDC4),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      ),
+    );
+  }
+
   @override
   void dispose() {
-    nameController.dispose();
-    ageController.dispose();
-    heightController.dispose();
-    weightController.dispose();
-    emailController.dispose();
-    contactController.dispose();
-    homeAddressController.dispose();
-    officeAddressController.dispose();
-    collegeAddressController.dispose();
+    clearFields();
     super.dispose();
   }
 
@@ -63,23 +105,10 @@ class _SignupScreenState extends State<SignupScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Header
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Color(0xFF4ECDC4), width: 2),
-                  ),
-                  child: Text(
-                    'GYM Meal',
-                    style: TextStyle(
-                      color: Color(0xFF4ECDC4),
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
+                Center(
+                  child: SvgPicture.asset('assets/svg/logo.svg', height: 60),
                 ),
-                SizedBox(height: 32),
+                SizedBox(height: 20),
 
                 // Title
                 Text(
@@ -90,7 +119,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     fontWeight: FontWeight.w700,
                   ),
                 ),
-                SizedBox(height: 32),
+                SizedBox(height: 22),
 
                 // Your name
                 _buildLabel('Your name'),
@@ -98,8 +127,13 @@ class _SignupScreenState extends State<SignupScreen> {
                 _buildTextField(
                   controller: nameController,
                   hintText: 'Enter your name',
+                  inputFormatter: FilteringTextInputFormatter.allow(
+                    RegExp(r'[a-zA-Z\s]'),
+                  ),
                   validator: (value) {
                     if (value?.isEmpty ?? true) return 'Name is required';
+                    if (value!.trim().split(' ').length < 2)
+                      return 'Please enter your full name';
                     return null;
                   },
                 ),
@@ -112,8 +146,13 @@ class _SignupScreenState extends State<SignupScreen> {
                   controller: ageController,
                   hintText: 'Enter your age',
                   keyboardType: TextInputType.number,
+                  inputFormatter: FilteringTextInputFormatter.digitsOnly,
                   validator: (value) {
                     if (value?.isEmpty ?? true) return 'Age is required';
+                    int? age = int.tryParse(value!);
+                    if (age == null) return 'Please enter a valid age';
+                    if (age < 12 || age > 100)
+                      return 'Age must be between 12 and 100';
                     return null;
                   },
                 ),
@@ -145,11 +184,18 @@ class _SignupScreenState extends State<SignupScreen> {
                           SizedBox(height: 8),
                           _buildTextField(
                             controller: heightController,
-                            hintText: 'Enter your height',
+                            hintText: 'Enter height in cm',
                             keyboardType: TextInputType.number,
+                            inputFormatter:
+                                FilteringTextInputFormatter.digitsOnly,
                             validator: (value) {
                               if (value?.isEmpty ?? true)
                                 return 'Height is required';
+                              int? height = int.tryParse(value!);
+                              if (height == null)
+                                return 'Please enter a valid height';
+                              if (height < 100 || height > 250)
+                                return 'Height must be between 100 and 250 cm';
                               return null;
                             },
                           ),
@@ -165,11 +211,18 @@ class _SignupScreenState extends State<SignupScreen> {
                           SizedBox(height: 8),
                           _buildTextField(
                             controller: weightController,
-                            hintText: 'Enter your weight',
+                            hintText: 'Enter weight in kg',
                             keyboardType: TextInputType.number,
+                            inputFormatter:
+                                FilteringTextInputFormatter.digitsOnly,
                             validator: (value) {
                               if (value?.isEmpty ?? true)
                                 return 'Weight is required';
+                              int? weight = int.tryParse(value!);
+                              if (weight == null)
+                                return 'Please enter a valid weight';
+                              if (weight < 30 || weight > 200)
+                                return 'Weight must be between 30 and 200 kg';
                               return null;
                             },
                           ),
@@ -192,7 +245,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     if (!RegExp(
                       r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
                     ).hasMatch(value!)) {
-                      return 'Enter a valid email';
+                      return 'Please enter a valid email address';
                     }
                     return null;
                   },
@@ -206,9 +259,15 @@ class _SignupScreenState extends State<SignupScreen> {
                   controller: contactController,
                   hintText: 'Enter your contact number',
                   keyboardType: TextInputType.phone,
+                  inputFormatter: FilteringTextInputFormatter.digitsOnly,
                   validator: (value) {
                     if (value?.isEmpty ?? true)
                       return 'Contact number is required';
+                    if (value!.length != 10)
+                      return 'Contact number must be 10 digits';
+                    if (!RegExp(r'^[0-9]{10}$').hasMatch(value)) {
+                      return 'Please enter a valid contact number';
+                    }
                     return null;
                   },
                 ),
@@ -297,7 +356,7 @@ class _SignupScreenState extends State<SignupScreen> {
                       elevation: 0,
                     ),
                     child: Text(
-                      'Signup',
+                      'Go For Prefrences',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 18,
@@ -318,7 +377,16 @@ class _SignupScreenState extends State<SignupScreen> {
                         WidgetSpan(
                           child: GestureDetector(
                             onTap: () {
-                              _handleLogin();
+                              // Navigator.pushReplacementNamed(
+                              //   context,
+                              //   AppRoutes.login,
+                              // );
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => LoginScreen(),
+                                ),
+                              );
                             },
                             child: Text(
                               'Login',
@@ -361,11 +429,13 @@ class _SignupScreenState extends State<SignupScreen> {
     required String hintText,
     TextInputType? keyboardType,
     String? Function(String?)? validator,
+    TextInputFormatter? inputFormatter,
   }) {
     return TextFormField(
       controller: controller,
       keyboardType: keyboardType,
       validator: validator,
+      inputFormatters: inputFormatter != null ? [inputFormatter] : null,
       style: TextStyle(color: Color(0xFF2D3748), fontSize: 16),
       decoration: InputDecoration(
         hintText: hintText,
@@ -403,33 +473,94 @@ class _SignupScreenState extends State<SignupScreen> {
     required List<String> items,
     required ValueChanged<String?> onChanged,
   }) {
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 4),
-      decoration: BoxDecoration(
-        color: Color(0xFFBDE5DF),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<String>(
-          value: value,
-          hint: Text(
-            hintText,
-            style: TextStyle(color: Color(0xFF9CA3AF), fontSize: 16),
+    return Column(
+      children: [
+        GestureDetector(
+          onTap: () {
+            setState(() {
+              isGenderDropdownExpanded = !isGenderDropdownExpanded;
+            });
+          },
+          child: Container(
+            width: double.infinity,
+            padding: EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Color(0xFFBDE5DF),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    value ?? hintText,
+                    style: TextStyle(
+                      color: value == null
+                          ? Color(0xFF9CA3AF)
+                          : Color(0xFF2D3748),
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+                Icon(
+                  isGenderDropdownExpanded
+                      ? Icons.keyboard_arrow_up
+                      : Icons.keyboard_arrow_down,
+                  color: Color(0xFF2D3748),
+                  size: 24,
+                ),
+              ],
+            ),
           ),
-          icon: Icon(
-            Icons.keyboard_arrow_down,
-            color: Color(0xFF9CA3AF),
-            size: 24,
-          ),
-          style: TextStyle(color: Color(0xFF2D3748), fontSize: 16),
-          dropdownColor: Colors.white,
-          items: items.map((String item) {
-            return DropdownMenuItem<String>(value: item, child: Text(item));
-          }).toList(),
-          onChanged: onChanged,
         ),
-      ),
+        if (isGenderDropdownExpanded) ...[
+          SizedBox(height: 8),
+          Container(
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: Color(0xFF4ECDC4), width: 2),
+            ),
+            child: Column(
+              children: items.map((item) {
+                final isLast = item == items.last;
+                return GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      selectedGender = item;
+                      isGenderDropdownExpanded = false;
+                    });
+                    onChanged(item);
+                  },
+                  child: Container(
+                    width: double.infinity,
+                    padding: EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      border: !isLast
+                          ? Border(
+                              bottom: BorderSide(
+                                color: Color(0xFFE5E7EB),
+                                width: 1,
+                              ),
+                            )
+                          : null,
+                    ),
+                    child: Text(
+                      item,
+                      style: TextStyle(
+                        color: Color(0xFF2D3748),
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+        ],
+      ],
     );
   }
 
@@ -492,45 +623,6 @@ class _SignupScreenState extends State<SignupScreen> {
           borderSide: BorderSide(color: Color(0xFF4ECDC4), width: 2),
         ),
         contentPadding: EdgeInsets.all(20),
-      ),
-    );
-  }
-
-  void _handleSignup() {
-    // Show success message
-    _showSnackBar('Account created successfully!');
-
-    // Here you would typically:
-    // 1. Send data to your backend
-    // 2. Navigate to login or home screen
-    // 3. Store user data locally if needed
-
-    print('Signup Data:');
-    print('Name: ${nameController.text}');
-    print('Age: ${ageController.text}');
-    print('Gender: $selectedGender');
-    print('Height: ${heightController.text}');
-    print('Weight: ${weightController.text}');
-    print('Email: ${emailController.text}');
-    print('Contact: ${contactController.text}');
-    print('Home Address: ${homeAddressController.text}');
-    print('Office Address: ${officeAddressController.text}');
-    print('College Address: ${collegeAddressController.text}');
-  }
-
-  void _handleLogin() {
-    // Navigate to login screen
-    _showSnackBar('Navigating to login...');
-    // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginScreen()));
-  }
-
-  void _showSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Color(0xFF4ECDC4),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
     );
   }

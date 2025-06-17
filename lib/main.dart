@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:gym_app_user_1/config/routes.dart';
-import 'package:gym_app_user_1/providers/auth_provider.dart';
-import 'package:gym_app_user_1/providers/meal_plan_provider.dart';
-import 'package:gym_app_user_1/providers/subscription_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
-
+import 'package:gym_app_user_1/providers/auth_provider.dart';
+import 'package:gym_app_user_1/providers/profile_data_provider.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -23,8 +21,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()),
-        ChangeNotifierProvider(create: (_) => MealPlanProvider()),
-        ChangeNotifierProvider(create: (_) => SubscriptionProvider()),
+        ChangeNotifierProvider(create: (_) => ProfileDataProvider()),
       ],
       child: MaterialApp(
         title: 'Gym Meal Subscription',

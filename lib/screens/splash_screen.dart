@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gym_app_user_1/config/routes.dart';
-import 'package:gym_app_user_1/services/local_storage_service.dart';
+import 'package:gym_app_user_1/providers/auth_provider.dart';
+import 'package:provider/provider.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -41,12 +42,14 @@ class _SplashScreenState extends State<SplashScreen>
 
     // Navigate to appropriate screen after animation
     Future.delayed(const Duration(seconds: 3), () async {
-      final localStorageService = LocalStorageService();
-      final isLoggedIn = await localStorageService.isLoggedIn();
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final isLoggedIn = await authProvider.checkLoginStatus();
 
       if (mounted) {
         if (isLoggedIn) {
-          Navigator.pushReplacementNamed(context, AppRoutes.home);
+          // Initialize user data before navigation
+          await authProvider.initializeUser();
+          Navigator.pushReplacementNamed(context, AppRoutes.next);
         } else {
           Navigator.pushReplacementNamed(context, AppRoutes.onboarding);
         }

@@ -354,11 +354,11 @@ class _SubscriptionPlansPageState extends State<SubscriptionPlansPage> {
       _showSnackBar('Please select a plan');
       return;
     }
-    Navigator.pushNamedAndRemoveUntil(
-      context,
-      AppRoutes.profile,
-      (route) => false,
-    );
+    // Navigator.pushNamedAndRemoveUntil(
+    //   context,
+    //   AppRoutes.profile,
+    //   (route) => false,
+    // );
     Navigator.pop(context);
   }
 

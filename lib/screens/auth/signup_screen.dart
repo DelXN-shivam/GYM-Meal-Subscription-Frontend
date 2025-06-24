@@ -84,7 +84,7 @@ class _SignupScreenState extends State<SignupScreen> {
         );
         profileProvider.setSignupCompleted(true);
         profileProvider.logAllProfileData(pageName: 'Signup Screen');
-        Navigator.pushNamed(context, AppRoutes.home);
+        Navigator.pushNamed(context, AppRoutes.login);
       }
     } on FirebaseAuthException catch (e) {
       log("FirebaseAuthException: ${e.message}");

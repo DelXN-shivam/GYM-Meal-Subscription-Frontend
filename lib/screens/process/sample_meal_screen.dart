@@ -144,11 +144,17 @@ class _SampleMealScreenState extends State<SampleMealScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final textScale = MediaQuery.of(context).textScaleFactor;
+    final horizontalPadding = screenWidth * 0.06 > 24
+        ? 24.0
+        : screenWidth * 0.06;
     return Scaffold(
       backgroundColor: Color(0xFF0A0A0A),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: EdgeInsets.all(24),
+          padding: EdgeInsets.all(horizontalPadding),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -162,7 +168,7 @@ class _SampleMealScreenState extends State<SampleMealScreen> {
                     icon: Icon(
                       Icons.arrow_back_ios_new_rounded,
                       color: Colors.white,
-                      size: 24,
+                      size: screenWidth * 0.06 > 24 ? 24 : screenWidth * 0.06,
                     ),
                     padding: EdgeInsets.zero,
                     constraints: BoxConstraints(),
@@ -171,34 +177,44 @@ class _SampleMealScreenState extends State<SampleMealScreen> {
                     child: Center(
                       child: SvgPicture.asset(
                         'assets/svg/newLogo.svg',
-                        height: 40,
+                        height: screenHeight * 0.05 > 40
+                            ? 40
+                            : screenHeight * 0.05,
                       ),
                     ),
                   ),
-                  SizedBox(width: 24),
+                  SizedBox(width: horizontalPadding),
                 ],
               ),
-              SizedBox(height: 40),
+              SizedBox(
+                height: screenHeight * 0.05 > 40 ? 40 : screenHeight * 0.05,
+              ),
 
               // Title
               Text(
                 'Your Meal Plan',
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 32,
+                  fontSize: screenWidth * 0.08 > 32 ? 32 : screenWidth * 0.08,
                   fontWeight: FontWeight.bold,
                 ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
               SizedBox(height: 8),
               Text(
                 'Personalized nutrition for your goals',
                 style: TextStyle(
                   color: Colors.grey[400],
-                  fontSize: 16,
+                  fontSize: screenWidth * 0.04 > 16 ? 16 : screenWidth * 0.04,
                   fontWeight: FontWeight.w400,
                 ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
               ),
-              SizedBox(height: 40),
+              SizedBox(
+                height: screenHeight * 0.05 > 40 ? 40 : screenHeight * 0.05,
+              ),
 
               // // Stats Section
               // _buildSectionTitle('Your stats'),
@@ -279,6 +295,8 @@ class _SampleMealScreenState extends State<SampleMealScreen> {
         fontSize: 20,
         fontWeight: FontWeight.w600,
       ),
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
     );
   }
 
@@ -385,14 +403,18 @@ class _SampleMealScreenState extends State<SampleMealScreen> {
       ),
       child: Row(
         children: [
-          Text(icon, style: TextStyle(fontSize: 16)),
+          FittedBox(child: Text(icon, style: TextStyle(fontSize: 16))),
           SizedBox(width: 12),
-          Text(
-            '$label: $value',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-              color: Colors.white,
+          Expanded(
+            child: Text(
+              '$label: $value',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color: Colors.white,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
         ],
@@ -530,36 +552,49 @@ class _SampleMealScreenState extends State<SampleMealScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                mealName,
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
+              Flexible(
+                child: Text(
+                  mealName,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
-              Text(
-                calories,
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.white.withOpacity(0.8),
+              Flexible(
+                child: Text(
+                  calories,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.white.withOpacity(0.8),
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ],
           ),
         ),
         SizedBox(height: 12),
-        Row(
+        Wrap(
+          spacing: 12,
+          runSpacing: 12,
           children: items
               .map(
-                (item) => Expanded(
-                  child: Container(
-                    margin: EdgeInsets.only(
-                      right: items.indexOf(item) < items.length - 1 ? 12 : 0,
-                    ),
-                    child: _buildMealItem(item['name'], item['image']),
-                  ),
+                (item) => SizedBox(
+                  width:
+                      (MediaQuery.of(context).size.width -
+                          2 *
+                              (MediaQuery.of(context).size.width * 0.06 > 24
+                                  ? 24.0
+                                  : MediaQuery.of(context).size.width * 0.06) -
+                          24) /
+                      3,
+                  child: _buildMealItem(item['name'], item['image']),
                 ),
               )
               .toList(),
@@ -600,7 +635,11 @@ class _SampleMealScreenState extends State<SampleMealScreen> {
                 shape: BoxShape.circle,
                 border: Border.all(color: Colors.grey[800]!),
               ),
-              child: Center(child: Text(emoji, style: TextStyle(fontSize: 24))),
+              child: Center(
+                child: FittedBox(
+                  child: Text(emoji, style: TextStyle(fontSize: 24)),
+                ),
+              ),
             ),
             SizedBox(height: 10),
             Text(
@@ -611,6 +650,9 @@ class _SampleMealScreenState extends State<SampleMealScreen> {
                 fontWeight: FontWeight.w600,
                 color: Colors.white,
               ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              softWrap: true,
             ),
           ],
         ),

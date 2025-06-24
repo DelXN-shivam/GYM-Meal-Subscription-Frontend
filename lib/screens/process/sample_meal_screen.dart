@@ -1,29 +1,41 @@
+import 'dart:convert';
+import 'dart:developer';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gym_app_user_1/config/routes.dart';
+import 'package:gym_app_user_1/screens/process/subscription_details.dart';
+import 'package:provider/provider.dart';
+import 'package:gym_app_user_1/providers/profile_data_provider.dart';
 
 class SampleMealScreen extends StatefulWidget {
+  final String mongoId;
+  const SampleMealScreen({Key? key, required this.mongoId}) : super(key: key);
+
   @override
   _SampleMealScreenState createState() => _SampleMealScreenState();
 }
 
 class _SampleMealScreenState extends State<SampleMealScreen> {
   // User profile data
-  int age = 25;
-  String gender = 'Male';
-  double height = 175.0; // cm
-  double weight = 75.0; // kg
-  String activity = 'Moderate';
-  String goal = 'Gain muscle';
+  int? age;
+  String? gender;
+  double? height; // cm
+  double? weight; // kg
+  String? activity;
+  String? goal;
 
-  // Nutrition data
-  int calories = 2700;
-  int carbsPercent = 40;
-  int proteinPercent = 30;
-  int fatsPercent = 30;
+  // Nutrition data from backend
+  int calories = 0;
+  int carbsPercent = 0;
+  int proteinPercent = 0;
+  int fatsPercent = 0;
+  double bmiValue = 0;
+  int bmr = 0;
+  int tdee = 0;
 
   // Calculate BMI
-  double get bmi => weight / ((height / 100) * (height / 100));
+  double get bmi => bmiValue;
 
   // Meal data
   List<Map<String, dynamic>> breakfastItems = [
@@ -44,10 +56,96 @@ class _SampleMealScreenState extends State<SampleMealScreen> {
     {'name': 'Salad', 'image': '🥗'},
   ];
 
+  Future<void> fetchCaloriesData() async {
+    try {
+      log('Starting backend data storing...');
+      if (widget.mongoId.isEmpty) {
+        throw Exception('User ID not found. Please try again.');
+      }
+      final profileProvider = Provider.of<ProfileDataProvider>(
+        context,
+        listen: false,
+      );
+
+      // Update local state with profile data
+      setState(() {
+        age = profileProvider.age;
+        gender = profileProvider.gender;
+        height = profileProvider.height;
+        weight = profileProvider.weight;
+        activity = profileProvider.activityLevel;
+        goal = profileProvider.goal;
+      });
+
+      final backendResponse = await http.post(
+        Uri.parse(
+          'https://gym-meal-subscription-backend.vercel.app/api/v1/user/calculate-calories',
+        ),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: json.encode({
+          "gender": profileProvider.gender?.toLowerCase(),
+          "weight": profileProvider.weight,
+          "height": profileProvider.height,
+          "age": profileProvider.age,
+          "activityLevel": profileProvider.activityLevel?.toLowerCase(),
+          "goal": profileProvider.goal?.toLowerCase(),
+        }),
+      );
+      log('Update response status: ${backendResponse.statusCode}');
+      log('Update response body: ${backendResponse.body}');
+      if (backendResponse.statusCode == 200 ||
+          backendResponse.statusCode == 201) {
+        final responseData = json.decode(backendResponse.body);
+        log("Decoded Data: $responseData");
+
+        // Update state with response data
+        setState(() {
+          calories = responseData['recommendedCalories'] ?? 0;
+          bmiValue = double.parse(responseData['bmi'] ?? "0");
+          bmr = responseData['bmr'] ?? 0;
+          tdee = responseData['tdee'] ?? 0;
+
+          // Update macronutrients
+          if (responseData['macronutients'] != null) {
+            proteinPercent = responseData['macronutients']['protein'] ?? 0;
+            carbsPercent = responseData['macronutients']['carbs'] ?? 0;
+            fatsPercent = responseData['macronutients']['fats'] ?? 0;
+          }
+        });
+
+        log('Update successful, storing user data...');
+      } else {
+        throw Exception('Failed to update data. Please try again.');
+      }
+    } catch (e) {
+      log("An unexpected error occurred: $e");
+      log('Error: ${e.toString().replaceAll('Exception: ', '')}');
+    }
+
+    // Get the profile data provider
+    final profileProvider = Provider.of<ProfileDataProvider>(
+      context,
+      listen: false,
+    );
+
+    // Log all profile data before navigation
+    profileProvider.logAllProfileData(pageName: 'Sample Meal Screen');
+    profileProvider.setSampleMealCompleted(true);
+  }
+
+  @override
+  void initState() {
+    fetchCaloriesData();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFF8F9FA),
+      backgroundColor: Color(0xFF0A0A0A),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.all(24),
@@ -63,7 +161,7 @@ class _SampleMealScreenState extends State<SampleMealScreen> {
                     },
                     icon: Icon(
                       Icons.arrow_back_ios_new_rounded,
-                      color: Color(0xFF2D3748),
+                      color: Colors.white,
                       size: 24,
                     ),
                     padding: EdgeInsets.zero,
@@ -72,26 +170,35 @@ class _SampleMealScreenState extends State<SampleMealScreen> {
                   Expanded(
                     child: Center(
                       child: SvgPicture.asset(
-                        'assets/svg/logo.svg',
-                        height: 60,
+                        'assets/svg/newLogo.svg',
+                        height: 40,
                       ),
                     ),
                   ),
                   SizedBox(width: 24),
                 ],
               ),
-              SizedBox(height: 20),
+              SizedBox(height: 40),
 
               // Title
               Text(
                 'Your Meal Plan',
                 style: TextStyle(
-                  color: Color(0xFF2D3748),
-                  fontSize: 28,
-                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-              SizedBox(height: 32),
+              SizedBox(height: 8),
+              Text(
+                'Personalized nutrition for your goals',
+                style: TextStyle(
+                  color: Colors.grey[400],
+                  fontSize: 16,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+              SizedBox(height: 40),
 
               // // Stats Section
               // _buildSectionTitle('Your stats'),
@@ -130,14 +237,21 @@ class _SampleMealScreenState extends State<SampleMealScreen> {
                 child: ElevatedButton(
                   // onPressed: _showPlanSelectedDialog,
                   onPressed: () {
-                    Navigator.pushNamed(context, AppRoutes.subscriptionDetails);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            SubscriptionDetailsScreen(mongoId: widget.mongoId),
+                      ),
+                    );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFF4ECDC4),
+                    backgroundColor: Color(0xFF2D5BFF),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
                     elevation: 0,
+                    shadowColor: Color(0xFF2D5BFF).withOpacity(0.3),
                   ),
                   child: Text(
                     'Select plan Details',
@@ -161,8 +275,8 @@ class _SampleMealScreenState extends State<SampleMealScreen> {
     return Text(
       title,
       style: TextStyle(
-        color: Color(0xFF2D3748),
-        fontSize: 18,
+        color: Colors.white,
+        fontSize: 20,
         fontWeight: FontWeight.w600,
       ),
     );
@@ -173,15 +287,16 @@ class _SampleMealScreenState extends State<SampleMealScreen> {
       width: double.infinity,
       padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Color(0xFFBDE5DF),
+        color: Color(0xFF1A1A1A),
         borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.grey[800]!),
       ),
       child: Text(
         'Your personalized meal plan based on your preferences',
         style: TextStyle(
           fontSize: 16,
           fontWeight: FontWeight.w500,
-          color: Color(0xFF2D3748),
+          color: Colors.white,
         ),
       ),
     );
@@ -192,8 +307,9 @@ class _SampleMealScreenState extends State<SampleMealScreen> {
       width: double.infinity,
       padding: EdgeInsets.all(25),
       decoration: BoxDecoration(
-        color: Color(0xFFBDE5DF),
+        color: Color(0xFF1A1A1A),
         borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.grey[800]!),
       ),
       child: Column(
         children: [
@@ -202,7 +318,7 @@ class _SampleMealScreenState extends State<SampleMealScreen> {
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
-              color: Color(0xFF2D3748),
+              color: Colors.white,
             ),
           ),
           SizedBox(height: 10),
@@ -211,17 +327,24 @@ class _SampleMealScreenState extends State<SampleMealScreen> {
             style: TextStyle(
               fontSize: 48,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF2D3748),
+              color: Color(0xFF2D5BFF),
             ),
           ),
           SizedBox(height: 10),
           Text(
-            "That's a great start to begin with",
-            style: TextStyle(fontSize: 16, color: Color(0xFF4A5568)),
+            _getBMIMessage(bmi),
+            style: TextStyle(fontSize: 16, color: Colors.grey[400]),
           ),
         ],
       ),
     );
+  }
+
+  String _getBMIMessage(double bmi) {
+    if (bmi < 18.5) return "You're underweight";
+    if (bmi < 24.9) return "You're in a healthy weight range";
+    if (bmi < 29.9) return "You're overweight";
+    return "You're in the obese range";
   }
 
   Widget _buildProfileSummary() {
@@ -229,22 +352,23 @@ class _SampleMealScreenState extends State<SampleMealScreen> {
       width: double.infinity,
       padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Color(0xFFBDE5DF),
+        color: Color(0xFF1A1A1A),
         borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.grey[800]!),
       ),
       child: Column(
         children: [
-          _buildProfileItem('📈', 'Age', '$age'),
+          _buildProfileItem('📈', 'Age', '${age ?? ''}'),
           SizedBox(height: 12),
-          _buildProfileItem('⚧', 'Gender', gender),
+          _buildProfileItem('⚧', 'Gender', gender ?? ''),
           SizedBox(height: 12),
-          _buildProfileItem('📏', 'Height', '${height.toInt()} cm'),
+          _buildProfileItem('📏', 'Height', '${height?.toInt() ?? 0} cm'),
           SizedBox(height: 12),
-          _buildProfileItem('⚖️', 'Weight', '${weight.toInt()} kg'),
+          _buildProfileItem('⚖️', 'Weight', '${weight?.toInt() ?? 0} kg'),
           SizedBox(height: 12),
-          _buildProfileItem('🏃', 'Activity', activity),
+          _buildProfileItem('🏃', 'Activity', activity ?? ''),
           SizedBox(height: 12),
-          _buildProfileItem('🎯', 'Goal', goal),
+          _buildProfileItem('🎯', 'Goal', goal ?? ''),
         ],
       ),
     );
@@ -255,8 +379,9 @@ class _SampleMealScreenState extends State<SampleMealScreen> {
       width: double.infinity,
       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Color(0xFF0A0A0A),
         borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey[800]!),
       ),
       child: Row(
         children: [
@@ -267,7 +392,7 @@ class _SampleMealScreenState extends State<SampleMealScreen> {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w500,
-              color: Color(0xFF2D3748),
+              color: Colors.white,
             ),
           ),
         ],
@@ -280,16 +405,18 @@ class _SampleMealScreenState extends State<SampleMealScreen> {
       width: double.infinity,
       padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Color(0xFFBDE5DF),
+        color: Color(0xFF1A1A1A),
         borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.grey[800]!),
       ),
       child: Column(
         children: [
           Container(
             padding: EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Color(0xFF0A0A0A),
               borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.grey[800]!),
             ),
             child: Column(
               children: [
@@ -298,7 +425,7 @@ class _SampleMealScreenState extends State<SampleMealScreen> {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
-                    color: Color(0xFF4A5568),
+                    color: Colors.grey[400],
                   ),
                 ),
                 SizedBox(height: 5),
@@ -307,8 +434,22 @@ class _SampleMealScreenState extends State<SampleMealScreen> {
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF2D3748),
+                    color: Color(0xFF2D5BFF),
                   ),
+                ),
+                SizedBox(height: 10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'BMR: $bmr kcal  •  ',
+                      style: TextStyle(fontSize: 14, color: Colors.grey[400]),
+                    ),
+                    Text(
+                      'TDEE: $tdee kcal',
+                      style: TextStyle(fontSize: 14, color: Colors.grey[400]),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -332,8 +473,9 @@ class _SampleMealScreenState extends State<SampleMealScreen> {
     return Container(
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Color(0xFF0A0A0A),
         borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey[800]!),
       ),
       child: Column(
         children: [
@@ -342,7 +484,7 @@ class _SampleMealScreenState extends State<SampleMealScreen> {
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w500,
-              color: Color(0xFF4A5568),
+              color: Colors.grey[400],
             ),
           ),
           SizedBox(height: 5),
@@ -351,7 +493,7 @@ class _SampleMealScreenState extends State<SampleMealScreen> {
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF2D3748),
+              color: Colors.white,
             ),
           ),
         ],
@@ -382,7 +524,7 @@ class _SampleMealScreenState extends State<SampleMealScreen> {
         Container(
           padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           decoration: BoxDecoration(
-            color: Color(0xFF4ECDC4),
+            color: Color(0xFF2D5BFF),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Row(
@@ -393,7 +535,7 @@ class _SampleMealScreenState extends State<SampleMealScreen> {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFF2D3748),
+                  color: Colors.white,
                 ),
               ),
               Text(
@@ -401,7 +543,7 @@ class _SampleMealScreenState extends State<SampleMealScreen> {
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
-                  color: Color(0xFF4A5568),
+                  color: Colors.white.withOpacity(0.8),
                 ),
               ),
             ],
@@ -432,7 +574,7 @@ class _SampleMealScreenState extends State<SampleMealScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Selected: $name'),
-            backgroundColor: Color(0xFF4ECDC4),
+            backgroundColor: Color(0xFF2D5BFF),
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
@@ -444,8 +586,9 @@ class _SampleMealScreenState extends State<SampleMealScreen> {
       child: Container(
         padding: EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Color(0xFFBDE5DF),
+          color: Color(0xFF1A1A1A),
           borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.grey[800]!),
         ),
         child: Column(
           children: [
@@ -453,8 +596,9 @@ class _SampleMealScreenState extends State<SampleMealScreen> {
               width: 60,
               height: 60,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: Color(0xFF0A0A0A),
                 shape: BoxShape.circle,
+                border: Border.all(color: Colors.grey[800]!),
               ),
               child: Center(child: Text(emoji, style: TextStyle(fontSize: 24))),
             ),
@@ -465,7 +609,7 @@ class _SampleMealScreenState extends State<SampleMealScreen> {
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
-                color: Color(0xFF2D3748),
+                color: Colors.white,
               ),
             ),
           ],

@@ -49,14 +49,60 @@ class _NextPageState extends State<NextPage> {
     }
   }
 
+  Future<void> _handleLogout() async {
+    try {
+      // Show confirmation dialog
+      final shouldLogout = await showDialog<bool>(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Confirm Logout'),
+            content: const Text('Are you sure you want to logout?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                child: const Text('Logout'),
+              ),
+            ],
+          );
+        },
+      );
+
+      if (shouldLogout == true) {
+        // Get the auth provider and call logout
+        final authProvider = Provider.of<AuthProvider>(context, listen: false);
+        await authProvider.logout();
+
+        // Navigate back to login screen
+        if (mounted) {
+          Navigator.of(
+            context,
+          ).pushNamedAndRemoveUntil('/login', (route) => true);
+        }
+      }
+    } catch (e) {
+      print('Error during logout: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error during logout: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<AuthProvider>(
       builder: (context, authProvider, child) {
         final firebaseUser = authProvider.firebaseUser;
         final backendUserData = authProvider.backendUserData;
-
-        log("@@@@@@@@@@@@  $backendUserData  @@@@@@@@@@@");
 
         return Scaffold(
           appBar: AppBar(title: const Text('Welcome')),
@@ -115,9 +161,26 @@ class _NextPageState extends State<NextPage> {
                             )
                             .toList(),
                         const SizedBox(height: 20),
-                        ElevatedButton(
-                          onPressed: _loadLocalStorageData,
-                          child: const Text('Refresh Local Storage Data'),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: ElevatedButton(
+                                onPressed: _loadLocalStorageData,
+                                child: const Text('Refresh Local Storage Data'),
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: ElevatedButton(
+                                onPressed: _handleLogout,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.red,
+                                  foregroundColor: Colors.white,
+                                ),
+                                child: const Text('Logout'),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),

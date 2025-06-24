@@ -49,9 +49,9 @@ class _SplashScreenState extends State<SplashScreen>
         if (isLoggedIn) {
           // Initialize user data before navigation
           await authProvider.initializeUser();
-          Navigator.pushReplacementNamed(context, AppRoutes.next);
+          Navigator.pushReplacementNamed(context, AppRoutes.home);
         } else {
-          Navigator.pushReplacementNamed(context, AppRoutes.onboarding);
+          Navigator.pushReplacementNamed(context, AppRoutes.login);
         }
       }
     });

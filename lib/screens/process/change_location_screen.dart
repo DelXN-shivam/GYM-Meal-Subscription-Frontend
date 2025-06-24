@@ -2,6 +2,8 @@ import 'dart:math' as Math;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gym_app_user_1/config/routes.dart';
+import 'package:provider/provider.dart';
+import 'package:gym_app_user_1/providers/profile_data_provider.dart';
 
 class ChangeLocationScreen extends StatefulWidget {
   @override
@@ -746,6 +748,23 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
       _showSnackBar('Please enter a custom address');
       return;
     }
+
+    // Get the profile data provider
+    final profileProvider = Provider.of<ProfileDataProvider>(
+      context,
+      listen: false,
+    );
+
+    // Store location data in the provider
+    profileProvider.updateLocation(
+      currentLocation: selectedDeliveryLocation,
+      address: selectedDeliveryLocation == 'Custom'
+          ? customAddressController.text.trim()
+          : selectedDeliveryLocation,
+    );
+
+    // Log all profile data before navigation
+    profileProvider.logAllProfileData(pageName: 'Change Location Screen');
 
     // Log all selected data
     print('=== Setup Screen Data ===');

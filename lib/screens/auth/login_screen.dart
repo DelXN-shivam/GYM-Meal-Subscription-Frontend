@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:gym_app_user_1/config/routes.dart';
-import 'package:gym_app_user_1/screens/home/next_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:gym_app_user_1/services/local_storage_service.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -59,6 +58,7 @@ class _LoginScreenState extends State<LoginScreen> {
       final backendResponse = await http.post(
         Uri.parse(
           'https://gym-meal-subscription-backend.vercel.app/api/v1/auth/login',
+          // 'https://localhost:3500/api/v1/auth/login',
         ),
         headers: {
           'Content-Type': 'application/json',
@@ -86,7 +86,7 @@ class _LoginScreenState extends State<LoginScreen> {
         );
 
         // Navigate to next page
-        Navigator.pushReplacementNamed(context, AppRoutes.next);
+        Navigator.pushReplacementNamed(context, AppRoutes.home);
         log('Navigation completed');
       } else if (backendResponse.statusCode == 308) {
         // Handle redirect
@@ -153,8 +153,6 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _resetPassword() {
-    // TODO: Implement password reset functionality
-    // This is a placeholder for the actual implementation
     _showSnackBar('Password reset functionality is not implemented yet');
   }
 
@@ -162,9 +160,9 @@ class _LoginScreenState extends State<LoginScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: isError ? Colors.red : Color(0xFF4ECDC4),
+        backgroundColor: isError ? Color(0xFFFF5555) : Color(0xFF00FF88),
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
     );
   }
@@ -172,7 +170,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFF8F9FA),
+      backgroundColor: Color(0xFF0A0A0A),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.all(24),
@@ -183,33 +181,80 @@ class _LoginScreenState extends State<LoginScreen> {
               children: [
                 // Header
                 Center(
-                  child: SvgPicture.asset('assets/svg/logo.svg', height: 60),
+                  child: Container(
+                    padding: EdgeInsets.only(top: 26),
+                    child: SvgPicture.asset(
+                      'assets/svg/newLogo.svg',
+                      height: 40,
+                    ),
+                  ),
                 ),
-                SizedBox(height: 20),
+                SizedBox(height: 40),
 
                 // Title
                 Text(
-                  'Login',
+                  'Welcome Back',
                   style: TextStyle(
-                    color: Color(0xFF2D3748),
-                    fontSize: 28,
-                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
                 SizedBox(height: 8),
                 Text(
-                  'Welcome back to your fitness journey',
-                  style: TextStyle(color: Color(0xFF718096), fontSize: 16),
+                  'Sign in to continue your fitness journey',
+                  style: TextStyle(
+                    color: Colors.grey[400],
+                    fontSize: 16,
+                    fontWeight: FontWeight.w400,
+                  ),
                 ),
-                SizedBox(height: 32),
+                SizedBox(height: 40),
+
+                // Error message
+                if (_errorMessage != null) ...[
+                  Container(
+                    width: double.infinity,
+                    padding: EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Color(0xFFFF5555).withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: Color(0xFFFF5555).withOpacity(0.3),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.error_outline,
+                          color: Color(0xFFFF5555),
+                          size: 20,
+                        ),
+                        SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            _errorMessage!,
+                            style: TextStyle(
+                              color: Color(0xFFFF5555),
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 24),
+                ],
 
                 // Email field
                 _buildLabel('Email Address'),
-                SizedBox(height: 8),
+                SizedBox(height: 12),
                 _buildTextField(
                   controller: _emailController,
                   hintText: 'Enter your email',
                   keyboardType: TextInputType.emailAddress,
+                  prefixIcon: Icons.email_outlined,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter your email';
@@ -219,72 +264,14 @@ class _LoginScreenState extends State<LoginScreen> {
                     }
                     return null;
                   },
-                  prefixIcon: Icons.email,
                 ),
                 SizedBox(height: 24),
 
                 // Password field
                 _buildLabel('Password'),
-                SizedBox(height: 8),
-                TextFormField(
-                  controller: _passwordController,
-                  obscureText: !_isPasswordVisible,
-                  style: TextStyle(color: Color(0xFF2D3748), fontSize: 16),
-                  decoration: InputDecoration(
-                    hintText: 'Enter your password',
-                    hintStyle: TextStyle(
-                      color: Color(0xFF9CA3AF),
-                      fontSize: 16,
-                    ),
-                    filled: true,
-                    fillColor: Color(0xFFBDE5DF),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide.none,
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide.none,
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide(
-                        color: Color(0xFF4ECDC4),
-                        width: 2,
-                      ),
-                    ),
-                    errorBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide(color: Colors.red, width: 2),
-                    ),
-                    focusedErrorBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide(color: Colors.red, width: 2),
-                    ),
-                    contentPadding: EdgeInsets.all(20),
-                    prefixIcon: Icon(Icons.lock, color: Color(0xFF9CA3AF)),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _isPasswordVisible
-                            ? Icons.visibility_off
-                            : Icons.visibility,
-                        color: Color(0xFF9CA3AF),
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          _isPasswordVisible = !_isPasswordVisible;
-                        });
-                      },
-                    ),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your password';
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(height: 8),
+                SizedBox(height: 12),
+                _buildPasswordField(),
+                SizedBox(height: 16),
 
                 // Forgot password
                 Align(
@@ -294,47 +281,78 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: Text(
                       'Forgot Password?',
                       style: TextStyle(
-                        color: Color(0xFF4ECDC4),
+                        color: Color(0xFF2D5BFF),
                         fontWeight: FontWeight.w600,
+                        fontSize: 14,
                       ),
                     ),
                   ),
                 ),
-                SizedBox(height: 24),
+                SizedBox(height: 32),
 
                 // Login button
                 Container(
                   width: double.infinity,
                   height: 56,
-                  child: ElevatedButton(
-                    onPressed: _login,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFF4ECDC4),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
+                  child: Consumer<AuthProvider>(
+                    builder: (context, authProvider, _) => ElevatedButton(
+                      onPressed: authProvider.isLoading ? null : _login,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color(0xFF2D5BFF),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        elevation: 0,
+                        shadowColor: Color(0xFF2D5BFF).withOpacity(0.3),
                       ),
-                      elevation: 0,
-                    ),
-                    child: _isLoading
-                        ? CircularProgressIndicator(color: Colors.white)
-                        : Text(
-                            'Login',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
+                      child: authProvider.isLoading
+                          ? SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2,
+                              ),
+                            )
+                          : Text(
+                              'Sign In',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
-                          ),
+                    ),
                   ),
                 ),
-                SizedBox(height: 24),
+                SizedBox(height: 32),
+
+                // Divider
+                Row(
+                  children: [
+                    Expanded(child: Divider(color: Colors.grey[800])),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 16),
+                      child: Text(
+                        'OR',
+                        style: TextStyle(
+                          color: Colors.grey[400],
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                    Expanded(child: Divider(color: Colors.grey[800])),
+                  ],
+                ),
+                SizedBox(height: 32),
 
                 // Signup link
                 Center(
                   child: RichText(
                     text: TextSpan(
                       text: 'Don\'t have an account? ',
-                      style: TextStyle(color: Color(0xFF718096), fontSize: 16),
+                      style: TextStyle(color: Colors.grey[400], fontSize: 16),
                       children: [
                         WidgetSpan(
                           child: GestureDetector(
@@ -347,11 +365,11 @@ class _LoginScreenState extends State<LoginScreen> {
                             child: Text(
                               'Sign Up',
                               style: TextStyle(
-                                color: Color(0xFF4ECDC4),
+                                color: Color(0xFF2D5BFF),
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
                                 decoration: TextDecoration.underline,
-                                decorationColor: Color(0xFF4ECDC4),
+                                decorationColor: Color(0xFF2D5BFF),
                               ),
                             ),
                           ),
@@ -360,7 +378,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                 ),
-                SizedBox(height: 32),
+                SizedBox(height: 40),
               ],
             ),
           ),
@@ -373,7 +391,7 @@ class _LoginScreenState extends State<LoginScreen> {
     return Text(
       text,
       style: TextStyle(
-        color: Color(0xFF2D3748),
+        color: Colors.white,
         fontSize: 16,
         fontWeight: FontWeight.w600,
       ),
@@ -391,37 +409,90 @@ class _LoginScreenState extends State<LoginScreen> {
       controller: controller,
       keyboardType: keyboardType,
       validator: validator,
-      style: TextStyle(color: Color(0xFF2D3748), fontSize: 16),
+      style: TextStyle(color: Colors.white, fontSize: 16),
       decoration: InputDecoration(
         hintText: hintText,
-        hintStyle: TextStyle(color: Color(0xFF9CA3AF), fontSize: 16),
+        hintStyle: TextStyle(color: Colors.grey[400], fontSize: 16),
         filled: true,
-        fillColor: Color(0xFFBDE5DF),
+        fillColor: Color(0xFF1A1A1A),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide.none,
+          borderSide: BorderSide(color: Colors.grey[800]!),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide.none,
+          borderSide: BorderSide(color: Colors.grey[800]!),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(color: Color(0xFF4ECDC4), width: 2),
+          borderSide: BorderSide(color: Color(0xFF2D5BFF), width: 2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(color: Colors.red, width: 2),
+          borderSide: BorderSide(color: Color(0xFFFF5555), width: 2),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(color: Colors.red, width: 2),
+          borderSide: BorderSide(color: Color(0xFFFF5555), width: 2),
         ),
         contentPadding: EdgeInsets.all(20),
         prefixIcon: prefixIcon != null
-            ? Icon(prefixIcon, color: Color(0xFF9CA3AF))
+            ? Icon(prefixIcon, color: Colors.grey[400])
             : null,
       ),
+    );
+  }
+
+  Widget _buildPasswordField() {
+    return TextFormField(
+      controller: _passwordController,
+      obscureText: !_isPasswordVisible,
+      style: TextStyle(color: Colors.white, fontSize: 16),
+      decoration: InputDecoration(
+        hintText: 'Enter your password',
+        hintStyle: TextStyle(color: Colors.grey[400], fontSize: 16),
+        filled: true,
+        fillColor: Color(0xFF1A1A1A),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide(color: Colors.grey[800]!),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide(color: Colors.grey[800]!),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide(color: Color(0xFF2D5BFF), width: 2),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide(color: Color(0xFFFF5555), width: 2),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide(color: Color(0xFFFF5555), width: 2),
+        ),
+        contentPadding: EdgeInsets.all(20),
+        prefixIcon: Icon(Icons.lock_outline, color: Colors.grey[400]),
+        suffixIcon: IconButton(
+          icon: Icon(
+            _isPasswordVisible ? Icons.visibility_off : Icons.visibility,
+            color: Colors.grey[400],
+          ),
+          onPressed: () {
+            setState(() {
+              _isPasswordVisible = !_isPasswordVisible;
+            });
+          },
+        ),
+      ),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Please enter your password';
+        }
+        return null;
+      },
     );
   }
 }

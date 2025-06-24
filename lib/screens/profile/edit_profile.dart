@@ -133,12 +133,12 @@ class _EditProfileScreenState extends State<EditProfileScreen>
           SizedBox(height: 20),
           _buildTextField('Email', emailController, icon: Icons.email_outlined),
           SizedBox(height: 20),
-          _buildTextField(
-            'Skype',
-            skypeController,
-            icon: Icons.video_call_outlined,
-          ),
-          SizedBox(height: 20),
+          // _buildTextField(
+          //   'Skype',
+          //   skypeController,
+          //   icon: Icons.video_call_outlined,
+          // ),
+          // SizedBox(height: 20),
           _buildTextField('Phone', phoneController, icon: Icons.phone_outlined),
           SizedBox(height: 30),
           _buildChangePasswordButton(),

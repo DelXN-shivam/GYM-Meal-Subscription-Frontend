@@ -1,14 +1,26 @@
+import 'dart:convert';
+import 'dart:developer';
+import 'package:gym_app_user_1/screens/process/subscription_plans_screen.dart';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gym_app_user_1/config/routes.dart';
+import 'package:provider/provider.dart';
+import 'package:gym_app_user_1/providers/profile_data_provider.dart';
 
 class SubscriptionDetailsScreen extends StatefulWidget {
+  final String mongoId;
+  const SubscriptionDetailsScreen({Key? key, required this.mongoId})
+    : super(key: key);
+
   @override
   _SubscriptionDetailsScreenState createState() =>
       _SubscriptionDetailsScreenState();
 }
 
 class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
+  // final _formKey = GlobalKey<FormState>();
+  bool _isLoading = false;
   // Plan duration
   String? selectedDuration;
   final List<String> durations = ['Weekly', 'Monthly'];
@@ -19,12 +31,12 @@ class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
   final List<int> mealOptions = [1, 2, 3];
 
   // Meal types (multiple selection)
-  Set<String> selectedMealTypes = {'Breakfast'};
+  Set<String> selectedMealTypes = {};
   final List<String> allMealTypes = ['Breakfast', 'Lunch', 'Dinner'];
 
   // Number of days/weeks
-  String? selectedPlanDuration;
-  final List<String> planDurations = ['5 day meal plan', '7 day meal plan'];
+  int? selectedPlanDuration;
+  final List<int> planDurations = [5, 7];
 
   // Start date
   bool showDatePicker = false;
@@ -33,15 +45,142 @@ class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
 
   // Add these variables at the top of the class with other state variables
   String? selectedDefaultAddress;
-  final List<String> defaultAddresses = ['Home', 'Office', 'College', 'Custom'];
+  final List<String> defaultAddresses = ['Home', 'Office', 'College'];
 
   // Custom address
   TextEditingController customAddressController = TextEditingController();
 
+  Future<void> _handleContinue() async {
+    // Validate selections
+    if (selectedDuration == null) {
+      _showSnackBar('Please select a plan duration');
+      return;
+    }
+
+    if (selectedMealsPerDay == null) {
+      _showSnackBar('Please select number of meals per day');
+      return;
+    }
+
+    if (selectedPlanDuration == null) {
+      _showSnackBar('Please select a plan length');
+      return;
+    }
+
+    if (selectedDate == null) {
+      _showSnackBar('Please select a start date');
+      return;
+    }
+
+    if (selectedDefaultAddress == null) {
+      _showSnackBar('Please select a default delivery address');
+      return;
+    }
+
+    // Meal types count validation
+    if (selectedMealsPerDay != null &&
+        selectedMealTypes.length != selectedMealsPerDay) {
+      _showSnackBar('Please select exactly $selectedMealsPerDay meal type(s)');
+      return;
+    }
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      log('Starting backend data storing...');
+      if (widget.mongoId.isEmpty) {
+        throw Exception('User ID not found. Please try again.');
+      }
+      final backendResponse = await http.put(
+        Uri.parse(
+          'https://gym-meal-subscription-backend.vercel.app/api/v1/user/update/${widget.mongoId}',
+        ),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: json.encode({
+          "mealData": {
+            "mealPerDay": selectedMealsPerDay,
+            "mealTypes": selectedMealTypes.toList(),
+            "numberOfDays": selectedPlanDuration,
+            "mealDuration": selectedDuration!.toLowerCase(),
+            // "dietaryPreference": ,
+          },
+        }),
+      );
+      log('Update response status: ${backendResponse.statusCode}');
+      log('Update response body: ${backendResponse.body}');
+      if (backendResponse.statusCode == 200 ||
+          backendResponse.statusCode == 201) {
+        final responseData = json.decode(backendResponse.body);
+        log("Decoded Data: $responseData");
+        log('Update successful, storing user data...');
+        log(backendResponse.body);
+        _showSnackBar('Data updated successfully! ✅');
+
+        // Get the profile data provider
+        final profileProvider = Provider.of<ProfileDataProvider>(
+          context,
+          listen: false,
+        );
+
+        // Store meal preferences data in the provider
+        profileProvider.updateSubscriptionDetails(
+          planDuration: selectedPlanDuration,
+          mealsPerDay: selectedMealsPerDay,
+          selectedMealTypes: selectedMealTypes.toList(),
+          planLength: selectedPlanDuration,
+          startDate: selectedDate,
+          defaultDeliveryAddress: selectedDefaultAddress,
+        );
+        profileProvider.setPreferencesCompleted(true);
+
+        // Log all profile data before navigation
+        profileProvider.logAllProfileData(
+          pageName: 'Subscription Details Screen',
+        );
+
+        // Show success and print preferences
+        _showSnackBar('Fetching subscription details!');
+
+        log('=== SUBSCRIPTION DETAILS DATA ===');
+        log('Plan Duration: $selectedDuration');
+        log('Meals Per Day: $selectedMealsPerDay');
+        log('Meal Types: $selectedMealTypes');
+        log('Plan Length: $selectedPlanDuration');
+        log('Start Date: $selectedDate');
+        log('Default Delivery Address: $selectedDefaultAddress');
+
+        // Navigator.pushNamed(context, AppRoutes.setPreferences);
+
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) =>
+                SubscriptionPlansPage(mongoId: widget.mongoId),
+          ),
+        );
+      } else {
+        throw Exception('Failed to update data. Please try again.');
+      }
+    } catch (e) {
+      log("An unexpected error occurred: $e");
+      _showSnackBar('Error: ${e.toString().replaceAll('Exception: ', '')}');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFF8F9FA),
+      backgroundColor: Color(0xFF0A0A0A),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.all(24),
@@ -57,7 +196,7 @@ class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
                     },
                     icon: Icon(
                       Icons.arrow_back_ios_new_rounded,
-                      color: Color(0xFF2D3748),
+                      color: Colors.white,
                       size: 24,
                     ),
                     padding: EdgeInsets.zero,
@@ -66,35 +205,35 @@ class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
                   Expanded(
                     child: Center(
                       child: SvgPicture.asset(
-                        'assets/svg/logo.svg',
-                        height: 60,
+                        'assets/svg/newLogo.svg',
+                        height: 40,
                       ),
                     ),
                   ),
                   SizedBox(width: 24),
                 ],
               ),
-              SizedBox(height: 20),
+              SizedBox(height: 40),
 
               // Title
               Text(
                 'Subscription Details',
                 style: TextStyle(
-                  color: Color(0xFF2D3748),
-                  fontSize: 28,
-                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
               SizedBox(height: 8),
               Text(
                 'Choose plan details',
                 style: TextStyle(
-                  color: Color(0xFF4A5568),
+                  color: Colors.grey[400],
                   fontSize: 16,
-                  fontWeight: FontWeight.w500,
+                  fontWeight: FontWeight.w400,
                 ),
               ),
-              SizedBox(height: 32),
+              SizedBox(height: 40),
 
               // Plan Duration
               _buildSectionTitle('Plan duration'),
@@ -127,7 +266,6 @@ class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
               SizedBox(height: 32),
 
               // Add this before the Continue Button
-              SizedBox(height: 32),
               _buildSectionTitle('Default Delivery Address'),
               SizedBox(height: 12),
               _buildDefaultDeliveryAddress(),
@@ -138,22 +276,34 @@ class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
                 width: double.infinity,
                 height: 56,
                 child: ElevatedButton(
-                  onPressed: _handleContinue,
+                  onPressed: _isLoading ? null : _handleContinue,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFF4ECDC4),
+                    backgroundColor: Color(0xFF2D5BFF),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
                     elevation: 0,
+                    shadowColor: Color(0xFF2D5BFF).withOpacity(0.3),
                   ),
-                  child: Text(
-                    'Continue to choose your plan',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
+                  child: _isLoading
+                      ? SizedBox(
+                          width: 28,
+                          height: 28,
+                          child: CircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Colors.white,
+                            ),
+                            strokeWidth: 3,
+                          ),
+                        )
+                      : Text(
+                          'Continue to choose your plan',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                 ),
               ),
               SizedBox(height: 32),
@@ -168,8 +318,8 @@ class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
     return Text(
       title,
       style: TextStyle(
-        color: Color(0xFF2D3748),
-        fontSize: 18,
+        color: Colors.white,
+        fontSize: 20,
         fontWeight: FontWeight.w600,
       ),
     );
@@ -180,8 +330,9 @@ class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
       width: double.infinity,
       padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Color(0xFFBDE5DF),
+        color: Color(0xFF1A1A1A),
         borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.grey[800]!),
       ),
       child: Wrap(
         spacing: 16,
@@ -197,22 +348,25 @@ class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
-                color: isSelected ? Color(0xFF2D8A7A) : Colors.transparent,
+                color: isSelected ? Color(0xFF2D5BFF) : Colors.transparent,
                 borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: isSelected ? Color(0xFF2D5BFF) : Colors.grey[800]!,
+                ),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(
                     isSelected ? Icons.check : Icons.add,
-                    color: isSelected ? Colors.white : Color(0xFF2D3748),
+                    color: isSelected ? Colors.white : Colors.grey[400],
                     size: 20,
                   ),
                   SizedBox(width: 8),
                   Text(
                     duration,
                     style: TextStyle(
-                      color: isSelected ? Colors.white : Color(0xFF2D3748),
+                      color: isSelected ? Colors.white : Colors.white,
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                     ),
@@ -255,10 +409,10 @@ class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
         width: 100,
         padding: EdgeInsets.symmetric(vertical: 16, horizontal: 12),
         decoration: BoxDecoration(
-          color: isSelected ? Color(0xFF2D8A7A) : Color(0xFFBDE5DF),
+          color: isSelected ? Color(0xFF2D5BFF) : Color(0xFF1A1A1A),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isSelected ? Color(0xFF2D8A7A) : Colors.transparent,
+            color: isSelected ? Color(0xFF2D5BFF) : Colors.grey[800]!,
             width: 2,
           ),
         ),
@@ -268,7 +422,7 @@ class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
             Text(
               count.toString(),
               style: TextStyle(
-                color: isSelected ? Colors.white : Color(0xFF2D3748),
+                color: isSelected ? Colors.white : Colors.white,
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
               ),
@@ -277,7 +431,7 @@ class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
             Text(
               count == 1 ? 'Meal' : 'Meals',
               style: TextStyle(
-                color: isSelected ? Colors.white : Color(0xFF2D3748),
+                color: isSelected ? Colors.white : Colors.white,
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
               ),
@@ -293,47 +447,60 @@ class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
       width: double.infinity,
       padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Color(0xFFBDE5DF),
+        color: Color(0xFF1A1A1A),
         borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.grey[800]!),
       ),
       child: Wrap(
         spacing: 16,
         runSpacing: 16,
         children: allMealTypes.map((mealType) {
-          final isSelected = selectedMealTypes.contains(mealType);
+          final isSelected = selectedMealTypes.contains(mealType.toLowerCase());
+          final canSelectMore =
+              selectedMealsPerDay == null ||
+              selectedMealTypes.length < selectedMealsPerDay!;
           return GestureDetector(
             onTap: () {
               setState(() {
                 if (isSelected) {
                   if (selectedMealTypes.length > 1) {
-                    selectedMealTypes.remove(mealType);
+                    selectedMealTypes.remove(mealType.toLowerCase());
                   } else {
                     _showSnackBar('At least one meal type must be selected');
                   }
                 } else {
-                  selectedMealTypes.add(mealType);
+                  if (canSelectMore) {
+                    selectedMealTypes.add(mealType.toLowerCase());
+                  } else {
+                    _showSnackBar(
+                      'You can only select $selectedMealsPerDay meal type(s)',
+                    );
+                  }
                 }
               });
             },
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
-                color: isSelected ? Color(0xFF2D8A7A) : Colors.transparent,
+                color: isSelected ? Color(0xFF2D5BFF) : Colors.transparent,
                 borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: isSelected ? Color(0xFF2D5BFF) : Colors.grey[800]!,
+                ),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(
                     isSelected ? Icons.check : Icons.add,
-                    color: isSelected ? Colors.white : Color(0xFF2D3748),
+                    color: isSelected ? Colors.white : Colors.grey[400],
                     size: 20,
                   ),
                   SizedBox(width: 8),
                   Text(
                     mealType,
                     style: TextStyle(
-                      color: isSelected ? Colors.white : Color(0xFF2D3748),
+                      color: isSelected ? Colors.white : Colors.white,
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                     ),
@@ -352,10 +519,12 @@ class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
       width: double.infinity,
       padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Color(0xFFBDE5DF),
+        color: Color(0xFF1A1A1A),
         borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.grey[800]!),
       ),
       child: Column(
+        spacing: 16,
         children: planDurations.map((plan) {
           final isSelected = selectedPlanDuration == plan;
           return GestureDetector(
@@ -368,21 +537,24 @@ class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
               width: double.infinity,
               padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
-                color: isSelected ? Color(0xFF2D8A7A) : Colors.transparent,
+                color: isSelected ? Color(0xFF2D5BFF) : Colors.transparent,
                 borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: isSelected ? Color(0xFF2D5BFF) : Colors.grey[800]!,
+                ),
               ),
               child: Row(
                 children: [
                   Icon(
                     isSelected ? Icons.check : Icons.add,
-                    color: isSelected ? Colors.white : Color(0xFF2D3748),
+                    color: isSelected ? Colors.white : Colors.grey[400],
                     size: 20,
                   ),
                   SizedBox(width: 8),
                   Text(
-                    plan,
+                    '$plan day meal plan',
                     style: TextStyle(
-                      color: isSelected ? Colors.white : Color(0xFF2D3748),
+                      color: isSelected ? Colors.white : Colors.white,
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                     ),
@@ -409,8 +581,9 @@ class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
             width: double.infinity,
             padding: EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: Color(0xFFBDE5DF),
+              color: Color(0xFF1A1A1A),
               borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: Colors.grey[800]!),
             ),
             child: Row(
               children: [
@@ -421,8 +594,8 @@ class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
                         : 'Select start date',
                     style: TextStyle(
                       color: selectedDate == null
-                          ? Color(0xFF9CA3AF)
-                          : Color(0xFF2D3748),
+                          ? Colors.grey[400]
+                          : Colors.white,
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                     ),
@@ -432,7 +605,7 @@ class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
                   showDatePicker
                       ? Icons.keyboard_arrow_up
                       : Icons.keyboard_arrow_down,
-                  color: Color(0xFF2D3748),
+                  color: Colors.grey[400],
                   size: 24,
                 ),
               ],
@@ -444,9 +617,9 @@ class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
           Container(
             padding: EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Color(0xFF1A1A1A),
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Color(0xFF4ECDC4), width: 2),
+              border: Border.all(color: Color(0xFF2D5BFF), width: 2),
             ),
             child: Column(
               children: [
@@ -463,14 +636,14 @@ class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
                           );
                         });
                       },
-                      icon: Icon(Icons.chevron_left, color: Color(0xFF2D3748)),
+                      icon: Icon(Icons.chevron_left, color: Colors.white),
                     ),
                     Text(
                       '${_getMonthName(currentMonth.month)} ${currentMonth.year}',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
-                        color: Color(0xFF2D3748),
+                        color: Colors.white,
                       ),
                     ),
                     IconButton(
@@ -482,7 +655,7 @@ class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
                           );
                         });
                       },
-                      icon: Icon(Icons.chevron_right, color: Color(0xFF2D3748)),
+                      icon: Icon(Icons.chevron_right, color: Colors.white),
                     ),
                   ],
                 ),
@@ -499,7 +672,7 @@ class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
                           day,
                           style: TextStyle(
                             fontWeight: FontWeight.w600,
-                            color: Color(0xFF4A5568),
+                            color: Colors.grey[400],
                           ),
                         ),
                       ),
@@ -529,7 +702,7 @@ class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
                         child: Text(
                           'Cancel',
                           style: TextStyle(
-                            color: Color(0xFF4A5568),
+                            color: Colors.grey[400],
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -548,7 +721,7 @@ class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
                           });
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Color(0xFF4ECDC4),
+                          backgroundColor: Color(0xFF2D5BFF),
                           padding: EdgeInsets.symmetric(vertical: 12),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -656,7 +829,7 @@ class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
         width: 35,
         height: 35,
         decoration: BoxDecoration(
-          color: isSelected ? Color(0xFF4ECDC4) : Colors.transparent,
+          color: isSelected ? Color(0xFF2D5BFF) : Colors.transparent,
           shape: BoxShape.circle,
         ),
         child: Center(
@@ -666,10 +839,10 @@ class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
               fontSize: 16,
               fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
               color: isOtherMonth || isPast
-                  ? Color(0xFFCBD5E0)
+                  ? Colors.grey[800]
                   : isSelected
                   ? Colors.white
-                  : Color(0xFF2D3748),
+                  : Colors.white,
             ),
           ),
         ),
@@ -700,10 +873,12 @@ class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
       width: double.infinity,
       padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Color(0xFFBDE5DF),
+        color: Color(0xFF1A1A1A),
         borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.grey[800]!),
       ),
       child: Column(
+        spacing: 16,
         children: [
           ...defaultAddresses.map((address) {
             final isSelected = selectedDefaultAddress == address;
@@ -711,38 +886,36 @@ class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
               onTap: () {
                 setState(() {
                   selectedDefaultAddress = address;
-                  if (address != 'Custom') {
-                    customAddressController.clear();
-                  }
                 });
               },
               child: Container(
                 width: double.infinity,
                 padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 decoration: BoxDecoration(
-                  color: isSelected ? Color(0xFF2D8A7A) : Colors.transparent,
+                  color: isSelected ? Color(0xFF2D5BFF) : Colors.transparent,
                   borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: isSelected ? Color(0xFF2D5BFF) : Colors.grey[800]!,
+                  ),
                 ),
                 child: Row(
                   children: [
                     Icon(
                       isSelected ? Icons.check : Icons.add,
-                      color: isSelected ? Colors.white : Color(0xFF2D3748),
+                      color: isSelected ? Colors.white : Colors.grey[400],
                       size: 20,
                     ),
                     SizedBox(width: 8),
                     Icon(
-                      address == 'Custom'
-                          ? Icons.edit_location_alt_outlined
-                          : _getAddressIcon(address),
-                      color: isSelected ? Colors.white : Color(0xFF2D3748),
+                      _getAddressIcon(address),
+                      color: isSelected ? Colors.white : Colors.grey[400],
                       size: 20,
                     ),
                     SizedBox(width: 8),
                     Text(
                       address,
                       style: TextStyle(
-                        color: isSelected ? Colors.white : Color(0xFF2D3748),
+                        color: isSelected ? Colors.white : Colors.white,
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
                       ),
@@ -752,31 +925,6 @@ class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
               ),
             );
           }).toList(),
-          if (selectedDefaultAddress == 'Custom') ...[
-            SizedBox(height: 16),
-            Container(
-              width: double.infinity,
-              padding: EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: TextField(
-                controller: customAddressController,
-                maxLines: 4,
-                decoration: InputDecoration(
-                  hintText: 'Enter custom address',
-                  hintStyle: TextStyle(color: Color(0xFF9CA3AF)),
-                  border: InputBorder.none,
-                  contentPadding: EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 12,
-                  ),
-                ),
-                style: TextStyle(fontSize: 16, color: Color(0xFF2D3748)),
-              ),
-            ),
-          ],
         ],
       ),
     );
@@ -795,57 +943,6 @@ class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
     }
   }
 
-  void _handleContinue() {
-    // Validate selections
-    if (selectedDuration == null) {
-      _showSnackBar('Please select a plan duration');
-      return;
-    }
-
-    if (selectedMealsPerDay == null) {
-      _showSnackBar('Please select number of meals per day');
-      return;
-    }
-
-    if (selectedPlanDuration == null) {
-      _showSnackBar('Please select a plan length');
-      return;
-    }
-
-    if (selectedDate == null) {
-      _showSnackBar('Please select a start date');
-      return;
-    }
-
-    if (selectedDefaultAddress == null) {
-      _showSnackBar('Please select a default delivery address');
-      return;
-    }
-
-    if (selectedDefaultAddress == 'Custom' &&
-        customAddressController.text.trim().isEmpty) {
-      _showSnackBar('Please enter a custom address');
-      return;
-    }
-
-    // Log all selected data
-    print('=== Subscription Details Data ===');
-    print('Plan Duration: $selectedDuration');
-    print('Meals per Day: $selectedMealsPerDay');
-    print('Meal Types: ${selectedMealTypes.join(', ')}');
-    print('Plan Length: $selectedPlanDuration');
-    print(
-      'Start Date: ${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}',
-    );
-    print('Default Delivery Address: $selectedDefaultAddress');
-    if (selectedDefaultAddress == 'Custom') {
-      print('Custom Address: ${customAddressController.text.trim()}');
-    }
-    print('==============================');
-
-    Navigator.pushNamed(context, AppRoutes.subscriptionPlans);
-  }
-
   void _showSubscriptionSummary() {
     showDialog(
       context: context,
@@ -854,11 +951,12 @@ class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
+          backgroundColor: Color(0xFF1A1A1A),
           title: Text(
             'Subscription Summary',
             style: TextStyle(
               fontWeight: FontWeight.bold,
-              color: Color(0xFF2D8A7A),
+              color: Color(0xFF2D5BFF),
             ),
           ),
           content: Column(
@@ -868,7 +966,10 @@ class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
               _buildSummaryItem('Plan Duration', selectedDuration!),
               _buildSummaryItem('Meals per Day', '$selectedMealsPerDay'),
               _buildSummaryItem('Meal Types', selectedMealTypes.join(', ')),
-              _buildSummaryItem('Plan Length', selectedPlanDuration!),
+              _buildSummaryItem(
+                'Plan Length',
+                '${selectedPlanDuration ?? ''} day meal plan',
+              ),
               _buildSummaryItem(
                 'Start Date',
                 '${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}',
@@ -883,7 +984,7 @@ class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
               child: Text(
                 'Continue',
                 style: TextStyle(
-                  color: Color(0xFF2D8A7A),
+                  color: Color(0xFF2D5BFF),
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -902,16 +1003,13 @@ class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
           Text(
             '$label: ',
             style: TextStyle(
-              color: Color(0xFF4A5568),
+              color: Colors.grey[400],
               fontWeight: FontWeight.w500,
             ),
           ),
           Text(
             value,
-            style: TextStyle(
-              color: Color(0xFF2D3748),
-              fontWeight: FontWeight.w600,
-            ),
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
           ),
         ],
       ),
@@ -922,7 +1020,7 @@ class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: Color(0xFF4ECDC4),
+        backgroundColor: Color(0xFF2D5BFF),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         duration: Duration(seconds: 2),

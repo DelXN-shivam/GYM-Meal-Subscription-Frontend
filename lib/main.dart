@@ -43,6 +43,7 @@ class MyApp extends StatelessWidget {
           ),
         ),
         initialRoute: AppRoutes.splash,
+        // initialRoute: AppRoutes.login,
         routes: AppRoutes.routes,
       ),
     );

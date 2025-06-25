@@ -103,7 +103,7 @@ class _SignupScreenState extends State<SignupScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: Color(0xFF2D5BFF),
+        backgroundColor: Theme.of(context).colorScheme.primary,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
@@ -119,7 +119,7 @@ class _SignupScreenState extends State<SignupScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF0A0A0A),
+      backgroundColor: Theme.of(context).colorScheme.background,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.all(24),
@@ -144,7 +144,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 Text(
                   'Create Account',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.onBackground,
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
                   ),
@@ -153,7 +153,9 @@ class _SignupScreenState extends State<SignupScreen> {
                 Text(
                   'Join us on your fitness journey',
                   style: TextStyle(
-                    color: Colors.grey[400],
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withOpacity(0.7),
                     fontSize: 16,
                     fontWeight: FontWeight.w400,
                   ),
@@ -245,12 +247,14 @@ class _SignupScreenState extends State<SignupScreen> {
                             }
                           },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFF2D5BFF),
+                      backgroundColor: Theme.of(context).colorScheme.primary,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                       ),
                       elevation: 0,
-                      shadowColor: Color(0xFF2D5BFF).withOpacity(0.3),
+                      shadowColor: Theme.of(
+                        context,
+                      ).colorScheme.primary.withOpacity(0.3),
                     ),
                     child: _isLoading
                         ? SizedBox(
@@ -264,7 +268,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         : Text(
                             'Continue',
                             style: TextStyle(
-                              color: Colors.white,
+                              color: Theme.of(context).colorScheme.onPrimary,
                               fontSize: 18,
                               fontWeight: FontWeight.w600,
                             ),
@@ -278,7 +282,12 @@ class _SignupScreenState extends State<SignupScreen> {
                   child: RichText(
                     text: TextSpan(
                       text: 'Already have an account? ',
-                      style: TextStyle(color: Colors.grey[400], fontSize: 16),
+                      style: TextStyle(
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withOpacity(0.7),
+                        fontSize: 16,
+                      ),
                       children: [
                         WidgetSpan(
                           child: GestureDetector(
@@ -297,11 +306,13 @@ class _SignupScreenState extends State<SignupScreen> {
                             child: Text(
                               'Login',
                               style: TextStyle(
-                                color: Color(0xFF2D5BFF),
+                                color: Theme.of(context).colorScheme.primary,
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
                                 decoration: TextDecoration.underline,
-                                decorationColor: Color(0xFF2D5BFF),
+                                decorationColor: Theme.of(
+                                  context,
+                                ).colorScheme.primary,
                               ),
                             ),
                           ),
@@ -323,7 +334,7 @@ class _SignupScreenState extends State<SignupScreen> {
     return Text(
       text,
       style: TextStyle(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.onBackground,
         fontSize: 16,
         fontWeight: FontWeight.w600,
       ),
@@ -342,31 +353,46 @@ class _SignupScreenState extends State<SignupScreen> {
       keyboardType: keyboardType,
       validator: validator,
       inputFormatters: inputFormatter != null ? [inputFormatter] : null,
-      style: TextStyle(color: Colors.white, fontSize: 16),
+      style: TextStyle(
+        color: Theme.of(context).colorScheme.onSurface,
+        fontSize: 16,
+      ),
       decoration: InputDecoration(
         hintText: hintText,
-        hintStyle: TextStyle(color: Colors.grey[400], fontSize: 16),
+        hintStyle: TextStyle(
+          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+          fontSize: 16,
+        ),
         filled: true,
-        fillColor: Color(0xFF1A1A1A),
+        fillColor: Theme.of(context).colorScheme.surface,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(color: Colors.grey[800]!),
+          borderSide: BorderSide(color: Theme.of(context).dividerColor),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(color: Colors.grey[800]!),
+          borderSide: BorderSide(color: Theme.of(context).dividerColor),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(color: Color(0xFF2D5BFF), width: 2),
+          borderSide: BorderSide(
+            color: Theme.of(context).colorScheme.primary,
+            width: 2,
+          ),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(color: Color(0xFFFF5555), width: 2),
+          borderSide: BorderSide(
+            color: Theme.of(context).colorScheme.error,
+            width: 2,
+          ),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(color: Color(0xFFFF5555), width: 2),
+          borderSide: BorderSide(
+            color: Theme.of(context).colorScheme.error,
+            width: 2,
+          ),
         ),
         contentPadding: EdgeInsets.all(20),
       ),

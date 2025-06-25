@@ -43,20 +43,21 @@ class _EditProfileScreenState extends State<EditProfileScreen>
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
     return Scaffold(
-      backgroundColor: Color(0xFF1C1C1E),
+      backgroundColor: colorScheme.background,
       appBar: AppBar(
-        backgroundColor: Color(0xFF1C1C1E),
+        backgroundColor: colorScheme.background,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(Icons.arrow_back, color: colorScheme.onBackground),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           'Edit Profile',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 20,
+          style: textTheme.titleLarge?.copyWith(
+            color: colorScheme.onBackground,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -67,11 +68,13 @@ class _EditProfileScreenState extends State<EditProfileScreen>
             padding: EdgeInsets.symmetric(horizontal: 20),
             child: TabBar(
               controller: _tabController,
-              indicatorColor: Color(0xFF007AFF),
+              indicatorColor: colorScheme.primary,
               indicatorWeight: 3,
-              labelColor: Color(0xFF007AFF),
-              unselectedLabelColor: Colors.grey[400],
-              labelStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              labelColor: colorScheme.primary,
+              unselectedLabelColor: colorScheme.onSurface.withOpacity(0.5),
+              labelStyle: textTheme.bodyLarge?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
               tabs: [
                 Tab(text: 'General Info'),
                 Tab(text: 'Location'),
@@ -84,15 +87,19 @@ class _EditProfileScreenState extends State<EditProfileScreen>
       body: TabBarView(
         controller: _tabController,
         children: [
-          _buildGeneralInfoTab(),
-          _buildLocationTab(),
-          _buildSettingsTab(),
+          _buildGeneralInfoTab(context, colorScheme, textTheme),
+          _buildLocationTab(context, colorScheme, textTheme),
+          _buildSettingsTab(context, colorScheme, textTheme),
         ],
       ),
     );
   }
 
-  Widget _buildGeneralInfoTab() {
+  Widget _buildGeneralInfoTab(
+    BuildContext context,
+    ColorScheme colorScheme,
+    TextTheme textTheme,
+  ) {
     return SingleChildScrollView(
       padding: EdgeInsets.all(20),
       child: Column(
@@ -112,10 +119,14 @@ class _EditProfileScreenState extends State<EditProfileScreen>
                 child: Container(
                   padding: EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Color(0xFF007AFF),
+                    color: colorScheme.primary,
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(Icons.camera_alt, color: Colors.white, size: 16),
+                  child: Icon(
+                    Icons.camera_alt,
+                    color: colorScheme.onPrimary,
+                    size: 16,
+                  ),
                 ),
               ),
             ],
@@ -124,14 +135,35 @@ class _EditProfileScreenState extends State<EditProfileScreen>
           Row(
             children: [
               Expanded(
-                child: _buildTextField('First Name', firstNameController),
+                child: _buildTextField(
+                  context,
+                  'First Name',
+                  firstNameController,
+                  colorScheme,
+                  textTheme,
+                ),
               ),
               SizedBox(width: 16),
-              Expanded(child: _buildTextField('Last Name', lastNameController)),
+              Expanded(
+                child: _buildTextField(
+                  context,
+                  'Last Name',
+                  lastNameController,
+                  colorScheme,
+                  textTheme,
+                ),
+              ),
             ],
           ),
           SizedBox(height: 20),
-          _buildTextField('Email', emailController, icon: Icons.email_outlined),
+          _buildTextField(
+            context,
+            'Email',
+            emailController,
+            colorScheme,
+            textTheme,
+            icon: Icons.email_outlined,
+          ),
           SizedBox(height: 20),
           // _buildTextField(
           //   'Skype',
@@ -139,58 +171,117 @@ class _EditProfileScreenState extends State<EditProfileScreen>
           //   icon: Icons.video_call_outlined,
           // ),
           // SizedBox(height: 20),
-          _buildTextField('Phone', phoneController, icon: Icons.phone_outlined),
+          _buildTextField(
+            context,
+            'Phone',
+            phoneController,
+            colorScheme,
+            textTheme,
+            icon: Icons.phone_outlined,
+          ),
           SizedBox(height: 30),
-          _buildChangePasswordButton(),
+          _buildChangePasswordButton(context, colorScheme, textTheme),
           SizedBox(height: 30),
-          _buildSaveButton(),
+          _buildSaveButton(context, colorScheme),
         ],
       ),
     );
   }
 
-  Widget _buildLocationTab() {
+  Widget _buildLocationTab(
+    BuildContext context,
+    ColorScheme colorScheme,
+    TextTheme textTheme,
+  ) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.location_on_outlined, color: Colors.grey[400], size: 80),
+          Icon(
+            Icons.location_on_outlined,
+            color: colorScheme.onSurface.withOpacity(0.5),
+            size: 80,
+          ),
           SizedBox(height: 20),
           Text(
             'Location Settings',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 24,
+            style: textTheme.headlineSmall?.copyWith(
+              color: colorScheme.onBackground,
               fontWeight: FontWeight.w600,
             ),
           ),
           SizedBox(height: 8),
           Text(
             'Manage your location preferences',
-            style: TextStyle(color: Colors.grey[400], fontSize: 16),
+            style: textTheme.bodyMedium?.copyWith(
+              color: colorScheme.onSurface.withOpacity(0.5),
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildSettingsTab() {
+  Widget _buildSettingsTab(
+    BuildContext context,
+    ColorScheme colorScheme,
+    TextTheme textTheme,
+  ) {
     return ListView(
       padding: EdgeInsets.all(20),
       children: [
-        _buildSettingsItem('Notifications', Icons.notifications_outlined),
-        _buildSettingsItem('Privacy', Icons.lock_outlined),
-        _buildSettingsItem('Theme', Icons.palette_outlined),
-        _buildSettingsItem('Language', Icons.language_outlined),
-        _buildSettingsItem('Help & Support', Icons.help_outline),
-        _buildSettingsItem('About', Icons.info_outline),
+        _buildSettingsItem(
+          context,
+          'Notifications',
+          Icons.notifications_outlined,
+          colorScheme,
+          textTheme,
+        ),
+        _buildSettingsItem(
+          context,
+          'Privacy',
+          Icons.lock_outlined,
+          colorScheme,
+          textTheme,
+        ),
+        _buildSettingsItem(
+          context,
+          'Theme',
+          Icons.palette_outlined,
+          colorScheme,
+          textTheme,
+        ),
+        _buildSettingsItem(
+          context,
+          'Language',
+          Icons.language_outlined,
+          colorScheme,
+          textTheme,
+        ),
+        _buildSettingsItem(
+          context,
+          'Help & Support',
+          Icons.help_outline,
+          colorScheme,
+          textTheme,
+        ),
+        _buildSettingsItem(
+          context,
+          'About',
+          Icons.info_outline,
+          colorScheme,
+          textTheme,
+        ),
       ],
     );
   }
 
   Widget _buildTextField(
+    BuildContext context,
     String label,
-    TextEditingController controller, {
+    TextEditingController controller,
+    ColorScheme colorScheme,
+    TextTheme textTheme, {
     IconData? icon,
   }) {
     return Column(
@@ -198,26 +289,29 @@ class _EditProfileScreenState extends State<EditProfileScreen>
       children: [
         Text(
           label,
-          style: TextStyle(
-            color: Colors.grey[400],
-            fontSize: 14,
+          style: textTheme.bodySmall?.copyWith(
+            color: colorScheme.onSurface.withOpacity(0.6),
             fontWeight: FontWeight.w500,
           ),
         ),
         SizedBox(height: 8),
         Container(
           decoration: BoxDecoration(
-            color: Color(0xFF2C2C2E),
+            color: colorScheme.surface,
             borderRadius: BorderRadius.circular(12),
           ),
           child: TextField(
             controller: controller,
-            style: TextStyle(color: Colors.white, fontSize: 16),
+            style: textTheme.bodyLarge?.copyWith(color: colorScheme.onSurface),
             decoration: InputDecoration(
               border: InputBorder.none,
               contentPadding: EdgeInsets.all(16),
               suffixIcon: icon != null
-                  ? Icon(icon, color: Colors.grey[400], size: 20)
+                  ? Icon(
+                      icon,
+                      color: colorScheme.onSurface.withOpacity(0.5),
+                      size: 20,
+                    )
                   : null,
             ),
           ),
@@ -226,7 +320,11 @@ class _EditProfileScreenState extends State<EditProfileScreen>
     );
   }
 
-  Widget _buildChangePasswordButton() {
+  Widget _buildChangePasswordButton(
+    BuildContext context,
+    ColorScheme colorScheme,
+    TextTheme textTheme,
+  ) {
     return GestureDetector(
       onTap: () {
         // Handle change password
@@ -235,28 +333,31 @@ class _EditProfileScreenState extends State<EditProfileScreen>
         width: double.infinity,
         padding: EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Color(0xFF2C2C2E),
+          color: colorScheme.surface,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
           children: [
             Text(
               'Change Password',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 16,
+              style: textTheme.bodyLarge?.copyWith(
+                color: colorScheme.onSurface,
                 fontWeight: FontWeight.w500,
               ),
             ),
             Spacer(),
-            Icon(Icons.chevron_right, color: Colors.grey[400], size: 20),
+            Icon(
+              Icons.chevron_right,
+              color: colorScheme.onSurface.withOpacity(0.5),
+              size: 20,
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildSaveButton() {
+  Widget _buildSaveButton(BuildContext context, ColorScheme colorScheme) {
     return Container(
       width: double.infinity,
       height: 56,
@@ -266,39 +367,48 @@ class _EditProfileScreenState extends State<EditProfileScreen>
           Navigator.pop(context);
         },
         style: ElevatedButton.styleFrom(
-          backgroundColor: Color(0xFF007AFF),
+          backgroundColor: colorScheme.primary,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
           elevation: 0,
         ),
-        child: Icon(Icons.check, color: Colors.white, size: 24),
+        child: Icon(Icons.check, color: colorScheme.onPrimary, size: 24),
       ),
     );
   }
 
-  Widget _buildSettingsItem(String title, IconData icon) {
+  Widget _buildSettingsItem(
+    BuildContext context,
+    String title,
+    IconData icon,
+    ColorScheme colorScheme,
+    TextTheme textTheme,
+  ) {
     return Container(
       margin: EdgeInsets.only(bottom: 12),
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Color(0xFF2C2C2E),
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
         children: [
-          Icon(icon, color: Colors.grey[400], size: 24),
+          Icon(icon, color: colorScheme.onSurface.withOpacity(0.5), size: 24),
           SizedBox(width: 16),
           Text(
             title,
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 16,
+            style: textTheme.bodyLarge?.copyWith(
+              color: colorScheme.onSurface,
               fontWeight: FontWeight.w500,
             ),
           ),
           Spacer(),
-          Icon(Icons.chevron_right, color: Colors.grey[400], size: 20),
+          Icon(
+            Icons.chevron_right,
+            color: colorScheme.onSurface.withOpacity(0.5),
+            size: 20,
+          ),
         ],
       ),
     );

@@ -5,7 +5,9 @@ import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gym_app_user_1/providers/auth_provider.dart';
 import 'package:gym_app_user_1/providers/profile_data_provider.dart';
+import 'package:gym_app_user_1/providers/theme_provider.dart';
 import 'firebase_options.dart';
+import 'package:gym_app_user_1/constants.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,29 +24,20 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => ProfileDataProvider()),
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
       ],
-      child: MaterialApp(
-        title: 'Gym Meal Subscription',
-        theme: ThemeData(
-          useMaterial3: true,
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: const Color(0xFF1E88E5),
-            brightness: Brightness.light,
-          ),
-          textTheme: GoogleFonts.poppinsTextTheme(),
-          appBarTheme: const AppBarTheme(centerTitle: true, elevation: 0),
-          elevatedButtonTheme: ElevatedButtonThemeData(
-            style: ElevatedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-          ),
-        ),
-        initialRoute: AppRoutes.splash,
-        // initialRoute: AppRoutes.login,
-        routes: AppRoutes.routes,
+      child: Consumer<ThemeProvider>(
+        builder: (context, themeProvider, _) {
+          return MaterialApp(
+            title: 'Gym Meal Subscription',
+            theme: lightThemeData,
+            darkTheme: darkThemeData,
+            themeMode: themeProvider.themeMode,
+            initialRoute: AppRoutes.splash,
+            // initialRoute: AppRoutes.login,
+            routes: AppRoutes.routes,
+          );
+        },
       ),
     );
   }

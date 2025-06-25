@@ -9,22 +9,22 @@ class MealsScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildHeader(),
+            _buildHeader(context),
             SizedBox(height: 30),
-            _buildSearchBar(),
+            _buildSearchBar(context),
             SizedBox(height: 30),
-            _buildMealCategories(),
+            _buildMealCategories(context),
             SizedBox(height: 30),
-            _buildPopularMeals(),
+            _buildPopularMeals(context),
             SizedBox(height: 30),
-            _buildRecentMeals(),
+            _buildRecentMeals(context),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -35,7 +35,7 @@ class MealsScreen extends StatelessWidget {
               Text(
                 'Meals & Nutrition',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.onBackground,
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
                 ),
@@ -45,7 +45,9 @@ class MealsScreen extends StatelessWidget {
               Text(
                 'Discover healthy meals for your goals',
                 style: TextStyle(
-                  color: Colors.grey[400],
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.7),
                   fontSize: 16,
                   fontWeight: FontWeight.w400,
                 ),
@@ -58,52 +60,70 @@ class MealsScreen extends StatelessWidget {
         Container(
           padding: EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: Color(0xFF1A1A1A),
+            color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.grey[800]!),
+            border: Border.all(color: Theme.of(context).dividerColor),
           ),
-          child: Icon(Icons.favorite_border, color: Colors.white, size: 24),
+          child: Icon(
+            Icons.favorite_border,
+            color: Theme.of(context).colorScheme.onSurface,
+            size: 24,
+          ),
         ),
       ],
     );
   }
 
-  Widget _buildSearchBar() {
+  Widget _buildSearchBar(BuildContext context) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: Color(0xFF1A1A1A),
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey[800]!),
+        border: Border.all(color: Theme.of(context).dividerColor),
       ),
       child: Row(
         children: [
-          Icon(Icons.search, color: Colors.grey[400], size: 20),
+          Icon(
+            Icons.search,
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+            size: 20,
+          ),
           SizedBox(width: 12),
           Expanded(
             child: TextField(
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onBackground,
+              ),
               decoration: InputDecoration(
                 hintText: 'Search meals, ingredients...',
-                hintStyle: TextStyle(color: Colors.grey[400]),
+                hintStyle: TextStyle(
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.7),
+                ),
                 border: InputBorder.none,
               ),
             ),
           ),
-          Icon(Icons.filter_list, color: Colors.grey[400], size: 20),
+          Icon(
+            Icons.filter_list,
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+            size: 20,
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildMealCategories() {
+  Widget _buildMealCategories(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'Categories',
           style: TextStyle(
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.onBackground,
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
@@ -113,17 +133,17 @@ class MealsScreen extends StatelessWidget {
           scrollDirection: Axis.horizontal,
           child: Row(
             children: [
-              _buildCategoryChip('All', true),
+              _buildCategoryChip(context, 'All', true),
               SizedBox(width: 12),
-              _buildCategoryChip('Breakfast', false),
+              _buildCategoryChip(context, 'Breakfast', false),
               SizedBox(width: 12),
-              _buildCategoryChip('Lunch', false),
+              _buildCategoryChip(context, 'Lunch', false),
               SizedBox(width: 12),
-              _buildCategoryChip('Dinner', false),
+              _buildCategoryChip(context, 'Dinner', false),
               SizedBox(width: 12),
-              _buildCategoryChip('Snacks', false),
+              _buildCategoryChip(context, 'Snacks', false),
               SizedBox(width: 12),
-              _buildCategoryChip('Protein', false),
+              _buildCategoryChip(context, 'Protein', false),
             ],
           ),
         ),
@@ -131,20 +151,30 @@ class MealsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildCategoryChip(String label, bool isSelected) {
+  Widget _buildCategoryChip(
+    BuildContext context,
+    String label,
+    bool isSelected,
+  ) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: isSelected ? Color(0xFF2D5BFF) : Color(0xFF1A1A1A),
+        color: isSelected
+            ? Theme.of(context).colorScheme.primary
+            : Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: isSelected ? Color(0xFF2D5BFF) : Colors.grey[800]!,
+          color: isSelected
+              ? Theme.of(context).colorScheme.primary
+              : Theme.of(context).dividerColor,
         ),
       ),
       child: Text(
         label,
         style: TextStyle(
-          color: isSelected ? Colors.white : Colors.grey[400],
+          color: isSelected
+              ? Theme.of(context).colorScheme.onPrimary
+              : Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
           fontSize: 14,
           fontWeight: FontWeight.w600,
         ),
@@ -152,7 +182,7 @@ class MealsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildPopularMeals() {
+  Widget _buildPopularMeals(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -162,7 +192,7 @@ class MealsScreen extends StatelessWidget {
             Text(
               'Popular Meals',
               style: TextStyle(
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.onBackground,
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
@@ -172,7 +202,7 @@ class MealsScreen extends StatelessWidget {
               child: Text(
                 'View All',
                 style: TextStyle(
-                  color: Color(0xFF2D5BFF),
+                  color: Theme.of(context).colorScheme.primary,
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                 ),
@@ -186,6 +216,7 @@ class MealsScreen extends StatelessWidget {
           child: Row(
             children: [
               _buildMealCard(
+                context,
                 'Protein Pancakes',
                 '420 kcal',
                 'High Protein',
@@ -194,6 +225,7 @@ class MealsScreen extends StatelessWidget {
               ),
               SizedBox(width: 16),
               _buildMealCard(
+                context,
                 'Grilled Chicken',
                 '380 kcal',
                 'Low Carb',
@@ -202,6 +234,7 @@ class MealsScreen extends StatelessWidget {
               ),
               SizedBox(width: 16),
               _buildMealCard(
+                context,
                 'Salmon Bowl',
                 '520 kcal',
                 'Omega-3',
@@ -216,6 +249,7 @@ class MealsScreen extends StatelessWidget {
   }
 
   Widget _buildMealCard(
+    BuildContext context,
     String name,
     String calories,
     String tag,
@@ -225,9 +259,9 @@ class MealsScreen extends StatelessWidget {
     return Container(
       width: 200,
       decoration: BoxDecoration(
-        color: Color(0xFF1A1A1A),
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey[800]!),
+        border: Border.all(color: Theme.of(context).dividerColor),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -235,11 +269,15 @@ class MealsScreen extends StatelessWidget {
           Container(
             height: 120,
             decoration: BoxDecoration(
-              color: Colors.grey[800],
+              color: Theme.of(context).dividerColor,
               borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
             ),
             child: Center(
-              child: Icon(Icons.restaurant, color: Colors.grey[600], size: 40),
+              child: Icon(
+                Icons.restaurant,
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+                size: 40,
+              ),
             ),
           ),
           Padding(
@@ -250,7 +288,7 @@ class MealsScreen extends StatelessWidget {
                 Text(
                   name,
                   style: TextStyle(
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.onBackground,
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
@@ -277,7 +315,9 @@ class MealsScreen extends StatelessWidget {
                     Text(
                       calories,
                       style: TextStyle(
-                        color: Colors.grey[400],
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withOpacity(0.7),
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
                       ),
@@ -292,20 +332,21 @@ class MealsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildRecentMeals() {
+  Widget _buildRecentMeals(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'Recent Meals',
           style: TextStyle(
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.onBackground,
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
         ),
         SizedBox(height: 16),
         _buildRecentMealItem(
+          context,
           'Breakfast Bowl',
           'Today, 8:30 AM',
           '450 kcal',
@@ -313,6 +354,7 @@ class MealsScreen extends StatelessWidget {
         ),
         SizedBox(height: 12),
         _buildRecentMealItem(
+          context,
           'Protein Shake',
           'Today, 7:00 AM',
           '180 kcal',
@@ -320,6 +362,7 @@ class MealsScreen extends StatelessWidget {
         ),
         SizedBox(height: 12),
         _buildRecentMealItem(
+          context,
           'Grilled Salmon',
           'Yesterday, 7:30 PM',
           '520 kcal',
@@ -330,6 +373,7 @@ class MealsScreen extends StatelessWidget {
   }
 
   Widget _buildRecentMealItem(
+    BuildContext context,
     String name,
     String time,
     String calories,
@@ -338,19 +382,23 @@ class MealsScreen extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Color(0xFF1A1A1A),
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey[800]!),
+        border: Border.all(color: Theme.of(context).dividerColor),
       ),
       child: Row(
         children: [
           Container(
             padding: EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Color(0xFF2D5BFF).withOpacity(0.1),
+              color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(icon, color: Color(0xFF2D5BFF), size: 20),
+            child: Icon(
+              icon,
+              color: Theme.of(context).colorScheme.primary,
+              size: 20,
+            ),
           ),
           SizedBox(width: 16),
           Expanded(
@@ -360,14 +408,19 @@ class MealsScreen extends StatelessWidget {
                 Text(
                   name,
                   style: TextStyle(
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.onBackground,
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
                 Text(
                   time,
-                  style: TextStyle(color: Colors.grey[400], fontSize: 12),
+                  style: TextStyle(
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withOpacity(0.7),
+                    fontSize: 12,
+                  ),
                 ),
               ],
             ),
@@ -375,7 +428,7 @@ class MealsScreen extends StatelessWidget {
           Text(
             calories,
             style: TextStyle(
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.onBackground,
               fontSize: 14,
               fontWeight: FontWeight.w600,
             ),

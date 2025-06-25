@@ -160,7 +160,9 @@ class _LoginScreenState extends State<LoginScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: isError ? Color(0xFFFF5555) : Color(0xFF00FF88),
+        backgroundColor: isError
+            ? Theme.of(context).colorScheme.error
+            : Theme.of(context).colorScheme.primary,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
@@ -170,7 +172,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF0A0A0A),
+      backgroundColor: Theme.of(context).colorScheme.background,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.all(24),
@@ -195,7 +197,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 Text(
                   'Welcome Back',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.onBackground,
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
                   ),
@@ -204,7 +206,9 @@ class _LoginScreenState extends State<LoginScreen> {
                 Text(
                   'Sign in to continue your fitness journey',
                   style: TextStyle(
-                    color: Colors.grey[400],
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onBackground.withOpacity(0.7),
                     fontSize: 16,
                     fontWeight: FontWeight.w400,
                   ),
@@ -217,17 +221,21 @@ class _LoginScreenState extends State<LoginScreen> {
                     width: double.infinity,
                     padding: EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Color(0xFFFF5555).withOpacity(0.1),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.surface.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: Color(0xFFFF5555).withOpacity(0.3),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.error.withOpacity(0.3),
                       ),
                     ),
                     child: Row(
                       children: [
                         Icon(
                           Icons.error_outline,
-                          color: Color(0xFFFF5555),
+                          color: Theme.of(context).colorScheme.error,
                           size: 20,
                         ),
                         SizedBox(width: 12),
@@ -235,7 +243,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           child: Text(
                             _errorMessage!,
                             style: TextStyle(
-                              color: Color(0xFFFF5555),
+                              color: Theme.of(context).colorScheme.error,
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
                             ),
@@ -281,7 +289,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: Text(
                       'Forgot Password?',
                       style: TextStyle(
-                        color: Color(0xFF2D5BFF),
+                        color: Theme.of(context).colorScheme.primary,
                         fontWeight: FontWeight.w600,
                         fontSize: 14,
                       ),
@@ -298,26 +306,28 @@ class _LoginScreenState extends State<LoginScreen> {
                     builder: (context, authProvider, _) => ElevatedButton(
                       onPressed: authProvider.isLoading ? null : _login,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(0xFF2D5BFF),
+                        backgroundColor: Theme.of(context).colorScheme.primary,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
                         ),
                         elevation: 0,
-                        shadowColor: Color(0xFF2D5BFF).withOpacity(0.3),
+                        shadowColor: Theme.of(
+                          context,
+                        ).colorScheme.primary.withOpacity(0.3),
                       ),
                       child: authProvider.isLoading
                           ? SizedBox(
                               height: 20,
                               width: 20,
                               child: CircularProgressIndicator(
-                                color: Colors.white,
+                                color: Theme.of(context).colorScheme.onPrimary,
                                 strokeWidth: 2,
                               ),
                             )
                           : Text(
                               'Sign In',
                               style: TextStyle(
-                                color: Colors.white,
+                                color: Theme.of(context).colorScheme.onPrimary,
                                 fontSize: 18,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -330,19 +340,25 @@ class _LoginScreenState extends State<LoginScreen> {
                 // Divider
                 Row(
                   children: [
-                    Expanded(child: Divider(color: Colors.grey[800])),
+                    Expanded(
+                      child: Divider(color: Theme.of(context).dividerColor),
+                    ),
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 16),
                       child: Text(
                         'OR',
                         style: TextStyle(
-                          color: Colors.grey[400],
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withOpacity(0.7),
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
                     ),
-                    Expanded(child: Divider(color: Colors.grey[800])),
+                    Expanded(
+                      child: Divider(color: Theme.of(context).dividerColor),
+                    ),
                   ],
                 ),
                 SizedBox(height: 32),
@@ -352,7 +368,12 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: RichText(
                     text: TextSpan(
                       text: 'Don\'t have an account? ',
-                      style: TextStyle(color: Colors.grey[400], fontSize: 16),
+                      style: TextStyle(
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withOpacity(0.7),
+                        fontSize: 16,
+                      ),
                       children: [
                         WidgetSpan(
                           child: GestureDetector(
@@ -365,11 +386,13 @@ class _LoginScreenState extends State<LoginScreen> {
                             child: Text(
                               'Sign Up',
                               style: TextStyle(
-                                color: Color(0xFF2D5BFF),
+                                color: Theme.of(context).colorScheme.primary,
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
                                 decoration: TextDecoration.underline,
-                                decorationColor: Color(0xFF2D5BFF),
+                                decorationColor: Theme.of(
+                                  context,
+                                ).colorScheme.primary,
                               ),
                             ),
                           ),
@@ -391,7 +414,7 @@ class _LoginScreenState extends State<LoginScreen> {
     return Text(
       text,
       style: TextStyle(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.onBackground,
         fontSize: 16,
         fontWeight: FontWeight.w600,
       ),
@@ -409,35 +432,53 @@ class _LoginScreenState extends State<LoginScreen> {
       controller: controller,
       keyboardType: keyboardType,
       validator: validator,
-      style: TextStyle(color: Colors.white, fontSize: 16),
+      style: TextStyle(
+        color: Theme.of(context).colorScheme.onSurface,
+        fontSize: 16,
+      ),
       decoration: InputDecoration(
         hintText: hintText,
-        hintStyle: TextStyle(color: Colors.grey[400], fontSize: 16),
+        hintStyle: TextStyle(
+          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+          fontSize: 16,
+        ),
         filled: true,
-        fillColor: Color(0xFF1A1A1A),
+        fillColor: Theme.of(context).colorScheme.surface,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(color: Colors.grey[800]!),
+          borderSide: BorderSide(color: Theme.of(context).dividerColor),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(color: Colors.grey[800]!),
+          borderSide: BorderSide(color: Theme.of(context).dividerColor),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(color: Color(0xFF2D5BFF), width: 2),
+          borderSide: BorderSide(
+            color: Theme.of(context).colorScheme.primary,
+            width: 2,
+          ),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(color: Color(0xFFFF5555), width: 2),
+          borderSide: BorderSide(
+            color: Theme.of(context).colorScheme.error,
+            width: 2,
+          ),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(color: Color(0xFFFF5555), width: 2),
+          borderSide: BorderSide(
+            color: Theme.of(context).colorScheme.error,
+            width: 2,
+          ),
         ),
         contentPadding: EdgeInsets.all(20),
         prefixIcon: prefixIcon != null
-            ? Icon(prefixIcon, color: Colors.grey[400])
+            ? Icon(
+                prefixIcon,
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+              )
             : null,
       ),
     );
@@ -447,38 +488,56 @@ class _LoginScreenState extends State<LoginScreen> {
     return TextFormField(
       controller: _passwordController,
       obscureText: !_isPasswordVisible,
-      style: TextStyle(color: Colors.white, fontSize: 16),
+      style: TextStyle(
+        color: Theme.of(context).colorScheme.onSurface,
+        fontSize: 16,
+      ),
       decoration: InputDecoration(
         hintText: 'Enter your password',
-        hintStyle: TextStyle(color: Colors.grey[400], fontSize: 16),
+        hintStyle: TextStyle(
+          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+          fontSize: 16,
+        ),
         filled: true,
-        fillColor: Color(0xFF1A1A1A),
+        fillColor: Theme.of(context).colorScheme.surface,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(color: Colors.grey[800]!),
+          borderSide: BorderSide(color: Theme.of(context).dividerColor),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(color: Colors.grey[800]!),
+          borderSide: BorderSide(color: Theme.of(context).dividerColor),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(color: Color(0xFF2D5BFF), width: 2),
+          borderSide: BorderSide(
+            color: Theme.of(context).colorScheme.primary,
+            width: 2,
+          ),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(color: Color(0xFFFF5555), width: 2),
+          borderSide: BorderSide(
+            color: Theme.of(context).colorScheme.error,
+            width: 2,
+          ),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(color: Color(0xFFFF5555), width: 2),
+          borderSide: BorderSide(
+            color: Theme.of(context).colorScheme.error,
+            width: 2,
+          ),
         ),
         contentPadding: EdgeInsets.all(20),
-        prefixIcon: Icon(Icons.lock_outline, color: Colors.grey[400]),
+        prefixIcon: Icon(
+          Icons.lock_outline,
+          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+        ),
         suffixIcon: IconButton(
           icon: Icon(
             _isPasswordVisible ? Icons.visibility_off : Icons.visibility,
-            color: Colors.grey[400],
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
           ),
           onPressed: () {
             setState(() {

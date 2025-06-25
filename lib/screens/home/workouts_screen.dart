@@ -9,22 +9,22 @@ class WorkoutsScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildHeader(),
+            _buildHeader(context),
             SizedBox(height: 30),
-            _buildWorkoutStats(),
+            _buildWorkoutStats(context),
             SizedBox(height: 30),
-            _buildWorkoutCategories(),
+            _buildWorkoutCategories(context),
             SizedBox(height: 30),
-            _buildTodayWorkout(),
+            _buildTodayWorkout(context),
             SizedBox(height: 30),
-            _buildPopularWorkouts(),
+            _buildPopularWorkouts(context),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -34,7 +34,7 @@ class WorkoutsScreen extends StatelessWidget {
             Text(
               'Workouts',
               style: TextStyle(
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.onBackground,
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
               ),
@@ -42,7 +42,7 @@ class WorkoutsScreen extends StatelessWidget {
             Text(
               'Stay active and healthy',
               style: TextStyle(
-                color: Colors.grey[400],
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                 fontSize: 16,
                 fontWeight: FontWeight.w400,
               ),
@@ -52,29 +52,36 @@ class WorkoutsScreen extends StatelessWidget {
         Container(
           padding: EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: Color(0xFF1A1A1A),
+            color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.grey[800]!),
+            border: Border.all(color: Theme.of(context).dividerColor),
           ),
-          child: Icon(Icons.fitness_center, color: Colors.white, size: 24),
+          child: Icon(
+            Icons.fitness_center,
+            color: Theme.of(context).colorScheme.onSurface,
+            size: 24,
+          ),
         ),
       ],
     );
   }
 
-  Widget _buildWorkoutStats() {
+  Widget _buildWorkoutStats(BuildContext context) {
     return Container(
       padding: EdgeInsets.all(24),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFF00FF88), Color(0xFF00CC6A)],
+          colors: [
+            Theme.of(context).colorScheme.primary,
+            Theme.of(context).colorScheme.secondary,
+          ],
         ),
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Color(0xFF00FF88).withOpacity(0.3),
+            color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
             blurRadius: 20,
             offset: Offset(0, 10),
           ),
@@ -89,7 +96,7 @@ class WorkoutsScreen extends StatelessWidget {
                 Text(
                   'This Week',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.onBackground,
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                   ),
@@ -98,7 +105,7 @@ class WorkoutsScreen extends StatelessWidget {
                 Text(
                   '4/7 days',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.onBackground,
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                   ),
@@ -106,7 +113,9 @@ class WorkoutsScreen extends StatelessWidget {
                 Text(
                   'Workouts completed',
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.8),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withOpacity(0.8),
                     fontSize: 14,
                   ),
                 ),
@@ -117,11 +126,15 @@ class WorkoutsScreen extends StatelessWidget {
             width: 80,
             height: 80,
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.2),
               shape: BoxShape.circle,
             ),
             child: Center(
-              child: Icon(Icons.directions_run, color: Colors.white, size: 40),
+              child: Icon(
+                Icons.directions_run,
+                color: Theme.of(context).colorScheme.onSurface,
+                size: 40,
+              ),
             ),
           ),
         ],
@@ -129,14 +142,14 @@ class WorkoutsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildWorkoutCategories() {
+  Widget _buildWorkoutCategories(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'Categories',
           style: TextStyle(
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.onBackground,
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
@@ -149,29 +162,33 @@ class WorkoutsScreen extends StatelessWidget {
               _buildCategoryCard(
                 'Strength',
                 Icons.fitness_center,
-                Color(0xFF00FF88),
+                Theme.of(context).colorScheme.primary,
                 '12 workouts',
+                context,
               ),
               SizedBox(width: 16),
               _buildCategoryCard(
                 'Cardio',
                 Icons.directions_run,
-                Color(0xFFFFAA00),
+                Theme.of(context).colorScheme.secondary,
                 '8 workouts',
+                context,
               ),
               SizedBox(width: 16),
               _buildCategoryCard(
                 'Yoga',
                 Icons.self_improvement,
-                Color(0xFF9C27B0),
+                Theme.of(context).colorScheme.error,
                 '6 workouts',
+                context,
               ),
               SizedBox(width: 16),
               _buildCategoryCard(
                 'HIIT',
                 Icons.timer,
-                Color(0xFFFF5555),
+                Theme.of(context).colorScheme.error,
                 '10 workouts',
+                context,
               ),
             ],
           ),
@@ -185,14 +202,15 @@ class WorkoutsScreen extends StatelessWidget {
     IconData icon,
     Color color,
     String count,
+    BuildContext context,
   ) {
     return Container(
       width: 160,
       padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Color(0xFF1A1A1A),
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.grey[800]!),
+        border: Border.all(color: Theme.of(context).dividerColor),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -209,19 +227,25 @@ class WorkoutsScreen extends StatelessWidget {
           Text(
             title,
             style: TextStyle(
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.onBackground,
               fontSize: 16,
               fontWeight: FontWeight.bold,
             ),
           ),
           SizedBox(height: 4),
-          Text(count, style: TextStyle(color: Colors.grey[400], fontSize: 12)),
+          Text(
+            count,
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+              fontSize: 12,
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildTodayWorkout() {
+  Widget _buildTodayWorkout(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -231,7 +255,7 @@ class WorkoutsScreen extends StatelessWidget {
             Text(
               'Today\'s Workout',
               style: TextStyle(
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.onBackground,
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
@@ -241,7 +265,7 @@ class WorkoutsScreen extends StatelessWidget {
               child: Text(
                 'Start',
                 style: TextStyle(
-                  color: Color(0xFF00FF88),
+                  color: Theme.of(context).colorScheme.primary,
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                 ),
@@ -253,9 +277,9 @@ class WorkoutsScreen extends StatelessWidget {
         Container(
           padding: EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: Color(0xFF1A1A1A),
+            color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.grey[800]!),
+            border: Border.all(color: Theme.of(context).dividerColor),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -265,12 +289,14 @@ class WorkoutsScreen extends StatelessWidget {
                   Container(
                     padding: EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: Color(0xFF00FF88).withOpacity(0.1),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.primary.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Icon(
                       Icons.fitness_center,
-                      color: Color(0xFF00FF88),
+                      color: Theme.of(context).colorScheme.primary,
                       size: 24,
                     ),
                   ),
@@ -282,7 +308,7 @@ class WorkoutsScreen extends StatelessWidget {
                         Text(
                           'Upper Body Strength',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: Theme.of(context).colorScheme.onBackground,
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                           ),
@@ -290,7 +316,9 @@ class WorkoutsScreen extends StatelessWidget {
                         Text(
                           '45 min • 8 exercises',
                           style: TextStyle(
-                            color: Colors.grey[400],
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurface.withOpacity(0.7),
                             fontSize: 14,
                           ),
                         ),
@@ -300,11 +328,11 @@ class WorkoutsScreen extends StatelessWidget {
                 ],
               ),
               SizedBox(height: 20),
-              _buildExerciseItem('Push-ups', '3 sets x 12 reps'),
+              _buildExerciseItem('Push-ups', '3 sets x 12 reps', context),
               SizedBox(height: 12),
-              _buildExerciseItem('Pull-ups', '3 sets x 8 reps'),
+              _buildExerciseItem('Pull-ups', '3 sets x 8 reps', context),
               SizedBox(height: 12),
-              _buildExerciseItem('Dumbbell Rows', '3 sets x 10 reps'),
+              _buildExerciseItem('Dumbbell Rows', '3 sets x 10 reps', context),
             ],
           ),
         ),
@@ -312,31 +340,37 @@ class WorkoutsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildExerciseItem(String name, String sets) {
+  Widget _buildExerciseItem(String name, String sets, BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
           name,
           style: TextStyle(
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.onBackground,
             fontSize: 16,
             fontWeight: FontWeight.w500,
           ),
         ),
-        Text(sets, style: TextStyle(color: Colors.grey[400], fontSize: 14)),
+        Text(
+          sets,
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+            fontSize: 14,
+          ),
+        ),
       ],
     );
   }
 
-  Widget _buildPopularWorkouts() {
+  Widget _buildPopularWorkouts(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'Popular Workouts',
           style: TextStyle(
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.onBackground,
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
@@ -346,21 +380,24 @@ class WorkoutsScreen extends StatelessWidget {
           'Full Body HIIT',
           '30 min',
           'High Intensity',
-          Color(0xFFFF5555),
+          Theme.of(context).colorScheme.error,
+          context,
         ),
         SizedBox(height: 12),
         _buildWorkoutItem(
           'Core Strength',
           '25 min',
           'Strength',
-          Color(0xFF00FF88),
+          Theme.of(context).colorScheme.primary,
+          context,
         ),
         SizedBox(height: 12),
         _buildWorkoutItem(
           'Cardio Blast',
           '40 min',
           'Cardio',
-          Color(0xFFFFAA00),
+          Theme.of(context).colorScheme.secondary,
+          context,
         ),
       ],
     );
@@ -371,13 +408,14 @@ class WorkoutsScreen extends StatelessWidget {
     String duration,
     String type,
     Color color,
+    BuildContext context,
   ) {
     return Container(
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Color(0xFF1A1A1A),
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey[800]!),
+        border: Border.all(color: Theme.of(context).dividerColor),
       ),
       child: Row(
         children: [
@@ -397,19 +435,28 @@ class WorkoutsScreen extends StatelessWidget {
                 Text(
                   name,
                   style: TextStyle(
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.onBackground,
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
                 Text(
                   '$duration • $type',
-                  style: TextStyle(color: Colors.grey[400], fontSize: 14),
+                  style: TextStyle(
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withOpacity(0.7),
+                    fontSize: 14,
+                  ),
                 ),
               ],
             ),
           ),
-          Icon(Icons.play_circle_outline, color: Colors.white, size: 24),
+          Icon(
+            Icons.play_circle_outline,
+            color: Theme.of(context).colorScheme.onSurface,
+            size: 24,
+          ),
         ],
       ),
     );

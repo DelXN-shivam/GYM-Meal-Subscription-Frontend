@@ -95,7 +95,7 @@ class _SubscriptionPlansPageState extends State<SubscriptionPlansPage> {
     return Text(
       title,
       style: TextStyle(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.onSurface,
         fontSize: 20,
         fontWeight: FontWeight.w600,
       ),
@@ -107,16 +107,18 @@ class _SubscriptionPlansPageState extends State<SubscriptionPlansPage> {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: Color(0xFF1A1A1A),
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.grey[800]!),
+        border: Border.all(color: Theme.of(context).dividerColor),
       ),
       child: Column(
         children: [
           Container(
             padding: EdgeInsets.all(25),
             decoration: BoxDecoration(
-              color: isSelected ? Color(0xFF2D5BFF) : Colors.transparent,
+              color: isSelected
+                  ? Theme.of(context).colorScheme.primary
+                  : Colors.transparent,
               borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
             ),
             child: Column(
@@ -124,7 +126,11 @@ class _SubscriptionPlansPageState extends State<SubscriptionPlansPage> {
                 Icon(
                   Icons.favorite_border,
                   size: 30,
-                  color: isSelected ? Colors.white : Colors.grey[400],
+                  color: isSelected
+                      ? Theme.of(context).colorScheme.onPrimary
+                      : Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withOpacity(0.7),
                 ),
                 SizedBox(height: 10),
                 Text(
@@ -132,7 +138,9 @@ class _SubscriptionPlansPageState extends State<SubscriptionPlansPage> {
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w600,
-                    color: isSelected ? Colors.white : Colors.white,
+                    color: isSelected
+                        ? Theme.of(context).colorScheme.onPrimary
+                        : Theme.of(context).colorScheme.onPrimary,
                   ),
                 ),
                 SizedBox(height: 5),
@@ -141,7 +149,9 @@ class _SubscriptionPlansPageState extends State<SubscriptionPlansPage> {
                   style: TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
-                    color: isSelected ? Colors.white : Colors.white,
+                    color: isSelected
+                        ? Theme.of(context).colorScheme.onPrimary
+                        : Theme.of(context).colorScheme.onPrimary,
                   ),
                 ),
                 SizedBox(height: 5),
@@ -150,7 +160,9 @@ class _SubscriptionPlansPageState extends State<SubscriptionPlansPage> {
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w500,
-                    color: isSelected ? Colors.white : Colors.white,
+                    color: isSelected
+                        ? Theme.of(context).colorScheme.onPrimary
+                        : Theme.of(context).colorScheme.onPrimary,
                   ),
                 ),
               ],
@@ -159,9 +171,9 @@ class _SubscriptionPlansPageState extends State<SubscriptionPlansPage> {
           Container(
             padding: EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: Color(0xFF0A0A0A),
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
-              border: Border.all(color: Colors.grey[800]!),
+              border: Border.all(color: Theme.of(context).dividerColor),
             ),
             child: Column(
               children: [
@@ -174,13 +186,18 @@ class _SubscriptionPlansPageState extends State<SubscriptionPlansPage> {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
                 SizedBox(height: 5),
                 Text(
                   'Protein 120g | Carbs 150g | Fats 50g',
-                  style: TextStyle(fontSize: 14, color: Colors.grey[400]),
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withOpacity(0.7),
+                  ),
                 ),
                 SizedBox(height: 20),
                 Container(
@@ -193,20 +210,22 @@ class _SubscriptionPlansPageState extends State<SubscriptionPlansPage> {
                       _showCheckoutDialog('Weekly Plan', '₹ 1,999');
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFF2D5BFF),
+                      backgroundColor: Theme.of(context).colorScheme.primary,
                       padding: EdgeInsets.symmetric(vertical: 15),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
                       elevation: 0,
-                      shadowColor: Color(0xFF2D5BFF).withOpacity(0.3),
+                      shadowColor: Theme.of(
+                        context,
+                      ).colorScheme.primary.withOpacity(0.3),
                     ),
                     child: Text(
                       'Proceed to checkout',
                       style: TextStyle(
                         fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.onPrimary,
                       ),
                     ),
                   ),
@@ -224,16 +243,18 @@ class _SubscriptionPlansPageState extends State<SubscriptionPlansPage> {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: Color(0xFF1A1A1A),
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.grey[800]!),
+        border: Border.all(color: Theme.of(context).dividerColor),
       ),
       child: Column(
         children: [
           Container(
             padding: EdgeInsets.all(25),
             decoration: BoxDecoration(
-              color: isSelected ? Color(0xFF2D5BFF) : Colors.transparent,
+              color: isSelected
+                  ? Theme.of(context).colorScheme.primary
+                  : Colors.transparent,
               borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
             ),
             child: Column(
@@ -241,7 +262,11 @@ class _SubscriptionPlansPageState extends State<SubscriptionPlansPage> {
                 Icon(
                   Icons.star_border,
                   size: 30,
-                  color: isSelected ? Colors.white : Colors.grey[400],
+                  color: isSelected
+                      ? Theme.of(context).colorScheme.onPrimary
+                      : Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withOpacity(0.7),
                 ),
                 SizedBox(height: 10),
                 Text(
@@ -249,7 +274,9 @@ class _SubscriptionPlansPageState extends State<SubscriptionPlansPage> {
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w600,
-                    color: isSelected ? Colors.white : Colors.white,
+                    color: isSelected
+                        ? Theme.of(context).colorScheme.onPrimary
+                        : Theme.of(context).colorScheme.onPrimary,
                   ),
                 ),
                 SizedBox(height: 5),
@@ -258,7 +285,9 @@ class _SubscriptionPlansPageState extends State<SubscriptionPlansPage> {
                   style: TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
-                    color: isSelected ? Colors.white : Colors.white,
+                    color: isSelected
+                        ? Theme.of(context).colorScheme.onPrimary
+                        : Theme.of(context).colorScheme.onPrimary,
                   ),
                 ),
                 SizedBox(height: 5),
@@ -267,7 +296,9 @@ class _SubscriptionPlansPageState extends State<SubscriptionPlansPage> {
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w500,
-                    color: isSelected ? Colors.white : Colors.white,
+                    color: isSelected
+                        ? Theme.of(context).colorScheme.onPrimary
+                        : Theme.of(context).colorScheme.onPrimary,
                   ),
                 ),
               ],
@@ -276,9 +307,9 @@ class _SubscriptionPlansPageState extends State<SubscriptionPlansPage> {
           Container(
             padding: EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: Color(0xFF0A0A0A),
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
-              border: Border.all(color: Colors.grey[800]!),
+              border: Border.all(color: Theme.of(context).dividerColor),
             ),
             child: Column(
               children: [
@@ -293,13 +324,18 @@ class _SubscriptionPlansPageState extends State<SubscriptionPlansPage> {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
                 SizedBox(height: 5),
                 Text(
                   'Protein 120g | Carbs 150g | Fats 50g',
-                  style: TextStyle(fontSize: 14, color: Colors.grey[400]),
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withOpacity(0.7),
+                  ),
                 ),
                 SizedBox(height: 20),
                 Container(
@@ -312,20 +348,22 @@ class _SubscriptionPlansPageState extends State<SubscriptionPlansPage> {
                       _showCheckoutDialog('Monthly Plan', '₹ 6,999');
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFF2D5BFF),
+                      backgroundColor: Theme.of(context).colorScheme.primary,
                       padding: EdgeInsets.symmetric(vertical: 15),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
                       elevation: 0,
-                      shadowColor: Color(0xFF2D5BFF).withOpacity(0.3),
+                      shadowColor: Theme.of(
+                        context,
+                      ).colorScheme.primary.withOpacity(0.3),
                     ),
                     child: Text(
                       'Proceed to checkout',
                       style: TextStyle(
                         fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.onPrimary,
                       ),
                     ),
                   ),
@@ -343,7 +381,10 @@ class _SubscriptionPlansPageState extends State<SubscriptionPlansPage> {
       padding: EdgeInsets.symmetric(vertical: 3),
       child: Text(
         detail,
-        style: TextStyle(fontSize: 14, color: Colors.grey[400]),
+        style: TextStyle(
+          fontSize: 14,
+          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+        ),
         textAlign: TextAlign.center,
       ),
     );
@@ -370,13 +411,13 @@ class _SubscriptionPlansPageState extends State<SubscriptionPlansPage> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
-          backgroundColor: Color(0xFF1A1A1A),
+          backgroundColor: Theme.of(context).colorScheme.surface,
           title: Text(
             'Confirm Purchase',
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF2D5BFF),
+              color: Theme.of(context).colorScheme.primary,
             ),
           ),
           content: Column(
@@ -388,7 +429,7 @@ class _SubscriptionPlansPageState extends State<SubscriptionPlansPage> {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
               SizedBox(height: 10),
@@ -397,13 +438,18 @@ class _SubscriptionPlansPageState extends State<SubscriptionPlansPage> {
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF2D5BFF),
+                  color: Theme.of(context).colorScheme.primary,
                 ),
               ),
               SizedBox(height: 15),
               Text(
                 'Are you sure you want to proceed with this subscription?',
-                style: TextStyle(fontSize: 14, color: Colors.grey[400]),
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.7),
+                ),
               ),
             ],
           ),
@@ -414,7 +460,10 @@ class _SubscriptionPlansPageState extends State<SubscriptionPlansPage> {
               },
               child: Text(
                 'Cancel',
-                style: TextStyle(color: Colors.grey[400], fontSize: 16),
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                  fontSize: 16,
+                ),
               ),
             ),
             ElevatedButton(
@@ -423,7 +472,7 @@ class _SubscriptionPlansPageState extends State<SubscriptionPlansPage> {
                 _processPayment(planName, price);
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xFF2D5BFF),
+                backgroundColor: Theme.of(context).colorScheme.primary,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -432,9 +481,9 @@ class _SubscriptionPlansPageState extends State<SubscriptionPlansPage> {
               child: Text(
                 'Confirm',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.onPrimary,
                   fontSize: 16,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),
@@ -474,12 +523,14 @@ class _SubscriptionPlansPageState extends State<SubscriptionPlansPage> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
-          backgroundColor: Color(0xFF1A1A1A),
+          backgroundColor: Theme.of(context).colorScheme.surface,
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF2D5BFF)),
+                valueColor: AlwaysStoppedAnimation<Color>(
+                  Theme.of(context).colorScheme.primary,
+                ),
               ),
               SizedBox(height: 20),
               Text(
@@ -487,7 +538,7 @@ class _SubscriptionPlansPageState extends State<SubscriptionPlansPage> {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
             ],
@@ -517,17 +568,21 @@ class _SubscriptionPlansPageState extends State<SubscriptionPlansPage> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
-          backgroundColor: Color(0xFF1A1A1A),
+          backgroundColor: Theme.of(context).colorScheme.surface,
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
                 padding: EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: Color(0xFF2D5BFF),
+                  color: Theme.of(context).colorScheme.primary,
                   shape: BoxShape.circle,
                 ),
-                child: Icon(Icons.check, size: 40, color: Colors.white),
+                child: Icon(
+                  Icons.check,
+                  size: 40,
+                  color: Theme.of(context).colorScheme.onPrimary,
+                ),
               ),
               SizedBox(height: 20),
               Text(
@@ -535,13 +590,17 @@ class _SubscriptionPlansPageState extends State<SubscriptionPlansPage> {
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.onPrimary,
                 ),
               ),
               SizedBox(height: 10),
               Text(
                 'Your $planName subscription has been activated.',
-                style: TextStyle(fontSize: 14, color: Colors.grey[400]),
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Theme.of(context).colorScheme.onSurface,
+                  fontWeight: FontWeight.w500,
+                ),
                 textAlign: TextAlign.center,
               ),
               SizedBox(height: 5),
@@ -550,7 +609,7 @@ class _SubscriptionPlansPageState extends State<SubscriptionPlansPage> {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFF2D5BFF),
+                  color: Theme.of(context).colorScheme.primary,
                 ),
               ),
               SizedBox(height: 20),
@@ -562,7 +621,7 @@ class _SubscriptionPlansPageState extends State<SubscriptionPlansPage> {
                     _handleContinue();
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFF2D5BFF),
+                    backgroundColor: Theme.of(context).colorScheme.primary,
                     padding: EdgeInsets.symmetric(vertical: 12),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -572,9 +631,9 @@ class _SubscriptionPlansPageState extends State<SubscriptionPlansPage> {
                   child: Text(
                     'Continue',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.onPrimary,
                       fontSize: 16,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
@@ -590,7 +649,7 @@ class _SubscriptionPlansPageState extends State<SubscriptionPlansPage> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: Color(0xFF2D5BFF),
+        backgroundColor: Theme.of(context).colorScheme.primary,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         duration: Duration(seconds: 2),

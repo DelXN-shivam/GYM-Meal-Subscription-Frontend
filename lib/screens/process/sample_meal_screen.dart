@@ -151,7 +151,7 @@ class _SampleMealScreenState extends State<SampleMealScreen> {
         ? 24.0
         : screenWidth * 0.06;
     return Scaffold(
-      backgroundColor: Color(0xFF0A0A0A),
+      backgroundColor: Theme.of(context).colorScheme.background,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.all(horizontalPadding),
@@ -167,7 +167,7 @@ class _SampleMealScreenState extends State<SampleMealScreen> {
                     },
                     icon: Icon(
                       Icons.arrow_back_ios_new_rounded,
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.onBackground,
                       size: screenWidth * 0.06 > 24 ? 24 : screenWidth * 0.06,
                     ),
                     padding: EdgeInsets.zero,
@@ -194,7 +194,7 @@ class _SampleMealScreenState extends State<SampleMealScreen> {
               Text(
                 'Your Meal Plan',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.onBackground,
                   fontSize: screenWidth * 0.08 > 32 ? 32 : screenWidth * 0.08,
                   fontWeight: FontWeight.bold,
                 ),
@@ -205,7 +205,9 @@ class _SampleMealScreenState extends State<SampleMealScreen> {
               Text(
                 'Personalized nutrition for your goals',
                 style: TextStyle(
-                  color: Colors.grey[400],
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onBackground.withOpacity(0.7),
                   fontSize: screenWidth * 0.04 > 16 ? 16 : screenWidth * 0.04,
                   fontWeight: FontWeight.w400,
                 ),
@@ -262,17 +264,19 @@ class _SampleMealScreenState extends State<SampleMealScreen> {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFF2D5BFF),
+                    backgroundColor: Theme.of(context).colorScheme.primary,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
                     elevation: 0,
-                    shadowColor: Color(0xFF2D5BFF).withOpacity(0.3),
+                    shadowColor: Theme.of(
+                      context,
+                    ).colorScheme.primary.withOpacity(0.3),
                   ),
                   child: Text(
                     'Select plan Details',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.onPrimary,
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
                     ),
@@ -291,7 +295,7 @@ class _SampleMealScreenState extends State<SampleMealScreen> {
     return Text(
       title,
       style: TextStyle(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.onBackground,
         fontSize: 20,
         fontWeight: FontWeight.w600,
       ),
@@ -305,16 +309,16 @@ class _SampleMealScreenState extends State<SampleMealScreen> {
       width: double.infinity,
       padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Color(0xFF1A1A1A),
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.grey[800]!),
+        border: Border.all(color: Theme.of(context).dividerColor),
       ),
       child: Text(
         'Your personalized meal plan based on your preferences',
         style: TextStyle(
           fontSize: 16,
           fontWeight: FontWeight.w500,
-          color: Colors.white,
+          color: Theme.of(context).colorScheme.onSurface,
         ),
       ),
     );
@@ -325,9 +329,9 @@ class _SampleMealScreenState extends State<SampleMealScreen> {
       width: double.infinity,
       padding: EdgeInsets.all(25),
       decoration: BoxDecoration(
-        color: Color(0xFF1A1A1A),
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.grey[800]!),
+        border: Border.all(color: Theme.of(context).dividerColor),
       ),
       child: Column(
         children: [
@@ -336,7 +340,7 @@ class _SampleMealScreenState extends State<SampleMealScreen> {
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
           SizedBox(height: 10),
@@ -345,13 +349,16 @@ class _SampleMealScreenState extends State<SampleMealScreen> {
             style: TextStyle(
               fontSize: 48,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF2D5BFF),
+              color: Theme.of(context).colorScheme.primary,
             ),
           ),
           SizedBox(height: 10),
           Text(
             _getBMIMessage(bmi),
-            style: TextStyle(fontSize: 16, color: Colors.grey[400]),
+            style: TextStyle(
+              fontSize: 16,
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+            ),
           ),
         ],
       ),
@@ -370,9 +377,9 @@ class _SampleMealScreenState extends State<SampleMealScreen> {
       width: double.infinity,
       padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Color(0xFF1A1A1A),
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.grey[800]!),
+        border: Border.all(color: Theme.of(context).dividerColor),
       ),
       child: Column(
         children: [
@@ -397,9 +404,9 @@ class _SampleMealScreenState extends State<SampleMealScreen> {
       width: double.infinity,
       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: Color(0xFF0A0A0A),
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey[800]!),
+        border: Border.all(color: Theme.of(context).dividerColor),
       ),
       child: Row(
         children: [
@@ -411,7 +418,7 @@ class _SampleMealScreenState extends State<SampleMealScreen> {
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -427,18 +434,18 @@ class _SampleMealScreenState extends State<SampleMealScreen> {
       width: double.infinity,
       padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Color(0xFF1A1A1A),
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.grey[800]!),
+        border: Border.all(color: Theme.of(context).dividerColor),
       ),
       child: Column(
         children: [
           Container(
             padding: EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: Color(0xFF0A0A0A),
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.grey[800]!),
+              border: Border.all(color: Theme.of(context).dividerColor),
             ),
             child: Column(
               children: [
@@ -447,7 +454,9 @@ class _SampleMealScreenState extends State<SampleMealScreen> {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
-                    color: Colors.grey[400],
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withOpacity(0.7),
                   ),
                 ),
                 SizedBox(height: 5),

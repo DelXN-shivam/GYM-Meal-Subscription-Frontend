@@ -2,6 +2,8 @@ import 'package:gym_app_user_1/screens/profile/profile_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:gym_app_user_1/providers/profile_data_provider.dart';
 import 'package:gym_app_user_1/providers/auth_provider.dart';
+import 'package:gym_app_user_1/providers/theme_provider.dart';
+import 'package:gym_app_user_1/services/local_storage_service.dart';
 
 import 'meals_screen.dart';
 import 'workouts_screen.dart';
@@ -16,14 +18,6 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
 
-  final List<Widget> _pages = [
-    _HomeTab(),
-    MealsScreen(),
-    WorkoutsScreen(),
-    ProgressScreen(),
-    ProfileScreen(),
-  ];
-
   final List<String> _pageTitles = [
     'Home',
     'Meals',
@@ -31,6 +25,28 @@ class _HomeScreenState extends State<HomeScreen> {
     'Progress',
     'Profile',
   ];
+
+  // User info for drawer
+  String? _username;
+  String? _email;
+  bool _userLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserInfo();
+  }
+
+  Future<void> _loadUserInfo() async {
+    final localStorage = LocalStorageService();
+    final username = await localStorage.getUsername();
+    final email = await localStorage.getMongoEmail();
+    setState(() {
+      _username = username;
+      _email = email;
+      _userLoading = false;
+    });
+  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -47,73 +63,180 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final List<Widget> _pages = [
+      _HomeTab(),
+      MealsScreen(),
+      WorkoutsScreen(),
+      ProgressScreen(),
+      ProfileScreen(),
+    ];
     return Scaffold(
-      backgroundColor: Color(0xFF0A0A0A),
+      backgroundColor: Theme.of(context).colorScheme.background,
       appBar: AppBar(
-        backgroundColor: Color(0xFF0A0A0A),
+        backgroundColor: Theme.of(context).colorScheme.background,
         elevation: 0,
         title: Text(
           _pageTitles[_selectedIndex],
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: Theme.of(context).colorScheme.onBackground),
         ),
-        iconTheme: IconThemeData(color: Colors.white),
+        iconTheme: IconThemeData(
+          color: Theme.of(context).colorScheme.onBackground,
+        ),
       ),
       drawer: Drawer(
-        backgroundColor: Color(0xFF181818),
+        backgroundColor: Theme.of(context).colorScheme.surface,
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
             UserAccountsDrawerHeader(
-              decoration: BoxDecoration(color: Color(0xFF2D5BFF)),
-              accountName: Text(
-                'Alex',
-                style: TextStyle(fontWeight: FontWeight.bold),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primary,
               ),
-              accountEmail: Text('alex@email.com'),
+              accountName: _userLoading
+                  ? const Text('...')
+                  : Text(
+                      _username ?? 'User',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.onPrimary,
+                      ),
+                    ),
+              accountEmail: _userLoading
+                  ? const Text('...')
+                  : Text(
+                      _email ?? '',
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onPrimary,
+                      ),
+                    ),
               currentAccountPicture: CircleAvatar(
-                backgroundColor: Colors.white,
-                child: Icon(Icons.person, color: Color(0xFF2D5BFF), size: 40),
+                backgroundColor: Theme.of(context).colorScheme.onPrimary,
+                child: Icon(
+                  Icons.person,
+                  color: Theme.of(context).colorScheme.primary,
+                  size: 40,
+                ),
               ),
             ),
             ListTile(
-              leading: Icon(Icons.home_rounded, color: Colors.white),
-              title: Text('Home', style: TextStyle(color: Colors.white)),
+              leading: Icon(
+                Icons.home_rounded,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
+              title: Text(
+                'Home',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+              ),
               onTap: () => _onDrawerItemTapped(0),
               selected: _selectedIndex == 0,
-              selectedTileColor: Color(0xFF232323),
+              selectedTileColor: Theme.of(context).colorScheme.surface,
             ),
             ListTile(
-              leading: Icon(Icons.fastfood_rounded, color: Colors.white),
-              title: Text('Meals', style: TextStyle(color: Colors.white)),
+              leading: Icon(
+                Icons.fastfood_rounded,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
+              title: Text(
+                'Meals',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+              ),
               onTap: () => _onDrawerItemTapped(1),
               selected: _selectedIndex == 1,
-              selectedTileColor: Color(0xFF232323),
+              selectedTileColor: Theme.of(context).colorScheme.surface,
             ),
             ListTile(
-              leading: Icon(Icons.directions_run_rounded, color: Colors.white),
-              title: Text('Workouts', style: TextStyle(color: Colors.white)),
+              leading: Icon(
+                Icons.directions_run_rounded,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
+              title: Text(
+                'Workouts',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+              ),
               onTap: () => _onDrawerItemTapped(2),
               selected: _selectedIndex == 2,
-              selectedTileColor: Color(0xFF232323),
+              selectedTileColor: Theme.of(context).colorScheme.surface,
             ),
             ListTile(
-              leading: Icon(Icons.trending_up_rounded, color: Colors.white),
-              title: Text('Progress', style: TextStyle(color: Colors.white)),
+              leading: Icon(
+                Icons.trending_up_rounded,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
+              title: Text(
+                'Progress',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+              ),
               onTap: () => _onDrawerItemTapped(3),
               selected: _selectedIndex == 3,
-              selectedTileColor: Color(0xFF232323),
+              selectedTileColor: Theme.of(context).colorScheme.surface,
             ),
             ListTile(
-              leading: Icon(Icons.account_circle_rounded, color: Colors.white),
-              title: Text('Profile', style: TextStyle(color: Colors.white)),
+              leading: Icon(
+                Icons.account_circle_rounded,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
+              title: Text(
+                'Profile',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+              ),
               onTap: () => _onDrawerItemTapped(4),
               selected: _selectedIndex == 4,
-              selectedTileColor: Color(0xFF232323),
+              selectedTileColor: Theme.of(context).colorScheme.surface,
             ),
-            Divider(color: Colors.grey[700]),
+            Divider(color: Theme.of(context).dividerColor),
             ListTile(
-              leading: Icon(Icons.settings, color: Colors.white),
-              title: Text('Settings', style: TextStyle(color: Colors.white)),
+              leading: Icon(
+                Icons.brightness_6,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
+              title: Text(
+                'Toggle Theme',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+              ),
+              subtitle: Text(
+                Provider.of<ThemeProvider>(context).themeMode == ThemeMode.light
+                    ? 'Light'
+                    : Provider.of<ThemeProvider>(context).themeMode ==
+                          ThemeMode.dark
+                    ? 'Dark'
+                    : 'System',
+                style: TextStyle(
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.6),
+                  fontSize: 12,
+                ),
+              ),
+              onTap: () {
+                Provider.of<ThemeProvider>(
+                  context,
+                  listen: false,
+                ).toggleTheme();
+              },
+            ),
+            ListTile(
+              leading: Icon(
+                Icons.settings,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
+              title: Text(
+                'Settings',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+              ),
               onTap: () {
                 // TODO: Implement settings navigation
                 Navigator.pop(context);
@@ -123,8 +246,16 @@ class _HomeScreenState extends State<HomeScreen> {
               },
             ),
             ListTile(
-              leading: Icon(Icons.logout, color: Colors.white),
-              title: Text('Logout', style: TextStyle(color: Colors.white)),
+              leading: Icon(
+                Icons.logout,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
+              title: Text(
+                'Logout',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+              ),
               onTap: () async {
                 Navigator.pop(context);
                 final shouldLogout = await showDialog<bool>(
@@ -165,10 +296,12 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: SafeArea(child: _pages[_selectedIndex]),
       bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Color(0xFF121212),
+        backgroundColor: Theme.of(context).colorScheme.surface,
         type: BottomNavigationBarType.fixed,
-        selectedItemColor: Colors.white,
-        unselectedItemColor: Colors.grey[500],
+        selectedItemColor: Theme.of(context).colorScheme.onSurface,
+        unselectedItemColor: Theme.of(
+          context,
+        ).colorScheme.onSurface.withOpacity(0.5),
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
         items: const [
@@ -198,8 +331,31 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-// The original Home tab content as a separate widget
-class _HomeTab extends StatelessWidget {
+// Replace _HomeTab with a stateful version that loads user info
+class _HomeTab extends StatefulWidget {
+  @override
+  State<_HomeTab> createState() => _HomeTabState();
+}
+
+class _HomeTabState extends State<_HomeTab> {
+  String? _username;
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserInfo();
+  }
+
+  Future<void> _loadUserInfo() async {
+    final localStorage = LocalStorageService();
+    final username = await localStorage.getUsername();
+    setState(() {
+      _username = username;
+      _loading = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -208,24 +364,24 @@ class _HomeTab extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildHeader(),
+            _buildHeader(context),
             SizedBox(height: 30),
-            _buildNutritionOverview(),
+            _buildNutritionOverview(context),
             SizedBox(height: 30),
             _buildProfileCompletionSteps(context),
             SizedBox(height: 30),
-            _buildMealCategories(),
+            _buildMealCategories(context),
             SizedBox(height: 30),
-            _buildTodaysMeals(),
+            _buildTodaysMeals(context),
             SizedBox(height: 30),
-            _buildQuickActions(),
+            _buildQuickActions(context),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -235,15 +391,17 @@ class _HomeTab extends StatelessWidget {
             Text(
               'Good Morning,',
               style: TextStyle(
-                color: Colors.grey[400],
+                color: Theme.of(
+                  context,
+                ).colorScheme.onBackground.withOpacity(0.7),
                 fontSize: 16,
                 fontWeight: FontWeight.w400,
               ),
             ),
             Text(
-              'Alex',
+              _loading ? '...' : (_username ?? 'User'),
               style: TextStyle(
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.onBackground,
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
               ),
@@ -253,13 +411,13 @@ class _HomeTab extends StatelessWidget {
         Container(
           padding: EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: Color(0xFF1A1A1A),
+            color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.grey[800]!),
+            border: Border.all(color: Theme.of(context).dividerColor),
           ),
           child: Icon(
             Icons.notifications_outlined,
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.onSurface,
             size: 24,
           ),
         ),
@@ -267,19 +425,22 @@ class _HomeTab extends StatelessWidget {
     );
   }
 
-  Widget _buildNutritionOverview() {
+  Widget _buildNutritionOverview(BuildContext context) {
     return Container(
       padding: EdgeInsets.all(24),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFF2D5BFF), Color(0xFF1A42CC)],
+          colors: [
+            Theme.of(context).colorScheme.primary,
+            Theme.of(context).colorScheme.secondary,
+          ],
         ),
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Color(0xFF2D5BFF).withOpacity(0.3),
+            color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
             blurRadius: 20,
             offset: Offset(0, 10),
           ),
@@ -294,7 +455,7 @@ class _HomeTab extends StatelessWidget {
               Text(
                 'Daily Nutrition',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.onBackground,
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
@@ -302,13 +463,15 @@ class _HomeTab extends StatelessWidget {
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
                   '2,450 kcal',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.onBackground,
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                   ),
@@ -320,15 +483,30 @@ class _HomeTab extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: _buildNutrientBar('Protein', 0.7, Color(0xFF00FF88)),
+                child: _buildNutrientBar(
+                  context,
+                  'Protein',
+                  0.7,
+                  Theme.of(context).colorScheme.primary,
+                ),
               ),
               SizedBox(width: 16),
               Expanded(
-                child: _buildNutrientBar('Carbs', 0.5, Color(0xFFFFAA00)),
+                child: _buildNutrientBar(
+                  context,
+                  'Carbs',
+                  0.5,
+                  Theme.of(context).colorScheme.secondary,
+                ),
               ),
               SizedBox(width: 16),
               Expanded(
-                child: _buildNutrientBar('Fats', 0.3, Color(0xFFFF5555)),
+                child: _buildNutrientBar(
+                  context,
+                  'Fats',
+                  0.3,
+                  Theme.of(context).colorScheme.error,
+                ),
               ),
             ],
           ),
@@ -337,14 +515,19 @@ class _HomeTab extends StatelessWidget {
     );
   }
 
-  Widget _buildNutrientBar(String label, double progress, Color color) {
+  Widget _buildNutrientBar(
+    BuildContext context,
+    String label,
+    double progress,
+    Color color,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
           style: TextStyle(
-            color: Colors.white.withOpacity(0.8),
+            color: Theme.of(context).colorScheme.onBackground.withOpacity(0.8),
             fontSize: 12,
             fontWeight: FontWeight.w500,
           ),
@@ -353,7 +536,7 @@ class _HomeTab extends StatelessWidget {
         Container(
           height: 6,
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.2),
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.2),
             borderRadius: BorderRadius.circular(3),
           ),
           child: FractionallySizedBox(
@@ -371,7 +554,7 @@ class _HomeTab extends StatelessWidget {
         Text(
           '${(progress * 100).toInt()}%',
           style: TextStyle(
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.onBackground,
             fontSize: 11,
             fontWeight: FontWeight.w600,
           ),
@@ -401,7 +584,7 @@ class _HomeTab extends StatelessWidget {
         Text(
           'Profile Completion',
           style: TextStyle(
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.onBackground,
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
@@ -420,15 +603,17 @@ class _HomeTab extends StatelessWidget {
                       CircleAvatar(
                         radius: 20,
                         backgroundColor: isCompleted
-                            ? Color(0xFF00FF88)
+                            ? Theme.of(context).colorScheme.primary
                             : isCurrent
-                            ? Color(0xFF2D5BFF)
-                            : Color(0xFF232323),
+                            ? Theme.of(context).colorScheme.primary
+                            : Theme.of(context).colorScheme.surface,
                         child: Icon(
                           steps[index]['icon'] as IconData,
                           color: isCompleted || isCurrent
-                              ? Colors.white
-                              : Colors.grey[500],
+                              ? Theme.of(context).colorScheme.onSurface
+                              : Theme.of(
+                                  context,
+                                ).colorScheme.onSurface.withOpacity(0.5),
                         ),
                       ),
                       SizedBox(height: 8),
@@ -436,8 +621,10 @@ class _HomeTab extends StatelessWidget {
                         steps[index]['label'] as String,
                         style: TextStyle(
                           color: isCompleted || isCurrent
-                              ? Colors.white
-                              : Colors.grey[500],
+                              ? Theme.of(context).colorScheme.onSurface
+                              : Theme.of(
+                                  context,
+                                ).colorScheme.onSurface.withOpacity(0.5),
                           fontSize: 12,
                           fontWeight: isCurrent
                               ? FontWeight.bold
@@ -451,8 +638,8 @@ class _HomeTab extends StatelessWidget {
                       width: 32,
                       height: 2,
                       color: isCompleted
-                          ? Color(0xFF00FF88)
-                          : Color(0xFF232323),
+                          ? Theme.of(context).colorScheme.primary
+                          : Theme.of(context).colorScheme.surface,
                     ),
                 ],
               );
@@ -463,7 +650,7 @@ class _HomeTab extends StatelessWidget {
     );
   }
 
-  Widget _buildMealCategories() {
+  Widget _buildMealCategories(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -473,7 +660,7 @@ class _HomeTab extends StatelessWidget {
             Text(
               'Meal Categories',
               style: TextStyle(
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.onBackground,
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
@@ -483,7 +670,7 @@ class _HomeTab extends StatelessWidget {
               child: Text(
                 'View All',
                 style: TextStyle(
-                  color: Color(0xFF2D5BFF),
+                  color: Theme.of(context).colorScheme.primary,
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                 ),
@@ -497,30 +684,34 @@ class _HomeTab extends StatelessWidget {
           child: Row(
             children: [
               _buildCategoryCard(
+                context,
                 'Pre-Workout',
                 Icons.fitness_center,
-                Color(0xFF00FF88),
+                Theme.of(context).colorScheme.primary,
                 '12 meals',
               ),
               SizedBox(width: 16),
               _buildCategoryCard(
+                context,
                 'Post-Workout',
                 Icons.sports_gymnastics,
-                Color(0xFFFFAA00),
+                Theme.of(context).colorScheme.secondary,
                 '18 meals',
               ),
               SizedBox(width: 16),
               _buildCategoryCard(
+                context,
                 'High Protein',
                 Icons.emoji_food_beverage,
-                Color(0xFFFF5555),
+                Theme.of(context).colorScheme.error,
                 '24 meals',
               ),
               SizedBox(width: 16),
               _buildCategoryCard(
+                context,
                 'Low Carb',
                 Icons.eco,
-                Color(0xFF9C27B0),
+                Theme.of(context).colorScheme.background,
                 '15 meals',
               ),
             ],
@@ -531,6 +722,7 @@ class _HomeTab extends StatelessWidget {
   }
 
   Widget _buildCategoryCard(
+    BuildContext context,
     String title,
     IconData icon,
     Color color,
@@ -540,9 +732,9 @@ class _HomeTab extends StatelessWidget {
       width: 160,
       padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Color(0xFF1A1A1A),
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.grey[800]!),
+        border: Border.all(color: Theme.of(context).dividerColor),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -559,32 +751,41 @@ class _HomeTab extends StatelessWidget {
           Text(
             title,
             style: TextStyle(
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.onBackground,
               fontSize: 16,
               fontWeight: FontWeight.bold,
             ),
           ),
           SizedBox(height: 4),
-          Text(count, style: TextStyle(color: Colors.grey[400], fontSize: 12)),
+          Text(
+            count,
+            style: TextStyle(
+              color: Theme.of(
+                context,
+              ).colorScheme.onBackground.withOpacity(0.5),
+              fontSize: 12,
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildTodaysMeals() {
+  Widget _buildTodaysMeals(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'Today\'s Meals',
           style: TextStyle(
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.onBackground,
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
         ),
         SizedBox(height: 16),
         _buildMealCard(
+          context,
           'Breakfast',
           'Protein Pancakes',
           '420 kcal',
@@ -593,6 +794,7 @@ class _HomeTab extends StatelessWidget {
         ),
         SizedBox(height: 12),
         _buildMealCard(
+          context,
           'Lunch',
           'Grilled Chicken Salad',
           '380 kcal',
@@ -601,6 +803,7 @@ class _HomeTab extends StatelessWidget {
         ),
         SizedBox(height: 12),
         _buildMealCard(
+          context,
           'Dinner',
           'Salmon & Vegetables',
           '520 kcal',
@@ -609,6 +812,7 @@ class _HomeTab extends StatelessWidget {
         ),
         SizedBox(height: 12),
         _buildMealCard(
+          context,
           'Snack',
           'Protein Smoothie',
           '180 kcal',
@@ -620,6 +824,7 @@ class _HomeTab extends StatelessWidget {
   }
 
   Widget _buildMealCard(
+    BuildContext context,
     String mealType,
     String mealName,
     String calories,
@@ -629,9 +834,9 @@ class _HomeTab extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Color(0xFF1A1A1A),
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey[800]!),
+        border: Border.all(color: Theme.of(context).dividerColor),
       ),
       child: Row(
         children: [
@@ -639,13 +844,15 @@ class _HomeTab extends StatelessWidget {
             padding: EdgeInsets.all(10),
             decoration: BoxDecoration(
               color: completed
-                  ? Color(0xFF00FF88).withOpacity(0.1)
-                  : Colors.grey[800],
+                  ? Theme.of(context).colorScheme.primary.withOpacity(0.1)
+                  : Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
               icon,
-              color: completed ? Color(0xFF00FF88) : Colors.grey[400],
+              color: completed
+                  ? Theme.of(context).colorScheme.primary
+                  : Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
               size: 20,
             ),
           ),
@@ -657,7 +864,9 @@ class _HomeTab extends StatelessWidget {
                 Text(
                   mealType,
                   style: TextStyle(
-                    color: Colors.grey[400],
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onBackground.withOpacity(0.5),
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
                   ),
@@ -665,7 +874,7 @@ class _HomeTab extends StatelessWidget {
                 Text(
                   mealName,
                   style: TextStyle(
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.onBackground,
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                   ),
@@ -679,13 +888,17 @@ class _HomeTab extends StatelessWidget {
               Text(
                 calories,
                 style: TextStyle(
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.onBackground,
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                 ),
               ),
               if (completed)
-                Icon(Icons.check_circle, color: Color(0xFF00FF88), size: 16),
+                Icon(
+                  Icons.check_circle,
+                  color: Theme.of(context).colorScheme.primary,
+                  size: 16,
+                ),
             ],
           ),
         ],
@@ -693,14 +906,14 @@ class _HomeTab extends StatelessWidget {
     );
   }
 
-  Widget _buildQuickActions() {
+  Widget _buildQuickActions(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'Quick Actions',
           style: TextStyle(
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.onBackground,
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
@@ -710,17 +923,19 @@ class _HomeTab extends StatelessWidget {
           children: [
             Expanded(
               child: _buildActionButton(
+                context,
                 'Meal Planner',
                 Icons.calendar_today,
-                Color(0xFF2D5BFF),
+                Theme.of(context).colorScheme.primary,
               ),
             ),
             SizedBox(width: 16),
             Expanded(
               child: _buildActionButton(
+                context,
                 'Grocery List',
                 Icons.shopping_cart,
-                Color(0xFF00FF88),
+                Theme.of(context).colorScheme.primary,
               ),
             ),
           ],
@@ -730,17 +945,19 @@ class _HomeTab extends StatelessWidget {
           children: [
             Expanded(
               child: _buildActionButton(
+                context,
                 'Recipe Search',
                 Icons.search,
-                Color(0xFFFFAA00),
+                Theme.of(context).colorScheme.secondary,
               ),
             ),
             SizedBox(width: 16),
             Expanded(
               child: _buildActionButton(
+                context,
                 'Nutrition Log',
                 Icons.bar_chart,
-                Color(0xFFFF5555),
+                Theme.of(context).colorScheme.error,
               ),
             ),
           ],
@@ -749,13 +966,18 @@ class _HomeTab extends StatelessWidget {
     );
   }
 
-  Widget _buildActionButton(String title, IconData icon, Color color) {
+  Widget _buildActionButton(
+    BuildContext context,
+    String title,
+    IconData icon,
+    Color color,
+  ) {
     return Container(
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Color(0xFF1A1A1A),
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey[800]!),
+        border: Border.all(color: Theme.of(context).dividerColor),
       ),
       child: Row(
         children: [
@@ -765,7 +987,7 @@ class _HomeTab extends StatelessWidget {
             child: Text(
               title,
               style: TextStyle(
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.onBackground,
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
               ),
@@ -784,7 +1006,10 @@ class _ProfileScreen extends StatelessWidget {
     return Center(
       child: Text(
         'Profile',
-        style: TextStyle(color: Colors.white, fontSize: 24),
+        style: TextStyle(
+          color: Theme.of(context).colorScheme.onBackground,
+          fontSize: 24,
+        ),
       ),
     );
   }

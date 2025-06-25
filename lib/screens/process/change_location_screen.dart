@@ -179,7 +179,7 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
       width: double.infinity,
       padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Color(0xFFBDE5DF),
+        color: Theme.of(context).colorScheme.secondary.withOpacity(0.2),
         borderRadius: BorderRadius.circular(20),
       ),
       child: GestureDetector(
@@ -194,12 +194,14 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
               width: 24,
               height: 24,
               decoration: BoxDecoration(
-                color: isPauseDelivery ? Color(0xFF2D8A7A) : Colors.transparent,
+                color: isPauseDelivery
+                    ? Theme.of(context).colorScheme.secondary
+                    : Colors.transparent,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: isPauseDelivery
-                      ? Color(0xFF2D8A7A)
-                      : Color(0xFF2D3748),
+                      ? Theme.of(context).colorScheme.secondary
+                      : Theme.of(context).dividerColor,
                   width: 2,
                 ),
               ),
@@ -208,14 +210,18 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
                   : null,
             ),
             SizedBox(width: 15),
-            Icon(Icons.pause, color: Color(0xFF2D3748), size: 20),
+            Icon(
+              Icons.pause,
+              color: Theme.of(context).colorScheme.onSurface,
+              size: 20,
+            ),
             SizedBox(width: 10),
             Text(
               'Pause delivery',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
-                color: Color(0xFF2D3748),
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
           ],
@@ -229,7 +235,7 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
       width: double.infinity,
       padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Color(0xFFBDE5DF),
+        color: Theme.of(context).colorScheme.secondary.withOpacity(0.2),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
@@ -245,27 +251,35 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
               width: double.infinity,
               padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
-                color: isSelected ? Color(0xFF2D8A7A) : Colors.transparent,
+                color: isSelected
+                    ? Theme.of(context).colorScheme.secondary
+                    : Colors.transparent,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Row(
                 children: [
                   Icon(
                     isSelected ? Icons.check : Icons.add,
-                    color: isSelected ? Colors.white : Color(0xFF2D3748),
+                    color: isSelected
+                        ? Colors.white
+                        : Theme.of(context).colorScheme.onSurface,
                     size: 20,
                   ),
                   SizedBox(width: 8),
                   Icon(
                     _getAddressIcon(address),
-                    color: isSelected ? Colors.white : Color(0xFF2D3748),
+                    color: isSelected
+                        ? Colors.white
+                        : Theme.of(context).colorScheme.onSurface,
                     size: 20,
                   ),
                   SizedBox(width: 8),
                   Text(
                     address,
                     style: TextStyle(
-                      color: isSelected ? Colors.white : Color(0xFF2D3748),
+                      color: isSelected
+                          ? Colors.white
+                          : Theme.of(context).colorScheme.onSurface,
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                     ),
@@ -292,7 +306,7 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
             width: double.infinity,
             padding: EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: Color(0xFFBDE5DF),
+              color: Theme.of(context).colorScheme.secondary.withOpacity(0.2),
               borderRadius: BorderRadius.circular(16),
             ),
             child: Row(
@@ -304,8 +318,8 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
                         : 'Select specific date',
                     style: TextStyle(
                       color: selectedDate == null
-                          ? Color(0xFF9CA3AF)
-                          : Color(0xFF2D3748),
+                          ? Theme.of(context).hintColor
+                          : Theme.of(context).colorScheme.onSurface,
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                     ),
@@ -315,7 +329,7 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
                   showDatePicker
                       ? Icons.keyboard_arrow_up
                       : Icons.keyboard_arrow_down,
-                  color: Color(0xFF2D3748),
+                  color: Theme.of(context).colorScheme.onSurface,
                   size: 24,
                 ),
               ],
@@ -327,9 +341,12 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
           Container(
             padding: EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Color(0xFF4ECDC4), width: 2),
+              border: Border.all(
+                color: Theme.of(context).colorScheme.primary,
+                width: 2,
+              ),
             ),
             child: Column(
               children: [
@@ -346,14 +363,17 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
                           );
                         });
                       },
-                      icon: Icon(Icons.chevron_left, color: Color(0xFF2D3748)),
+                      icon: Icon(
+                        Icons.chevron_left,
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
                     ),
                     Text(
                       '${_getMonthName(currentMonth.month)} ${currentMonth.year}',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
-                        color: Color(0xFF2D3748),
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
                     IconButton(
@@ -365,7 +385,10 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
                           );
                         });
                       },
-                      icon: Icon(Icons.chevron_right, color: Color(0xFF2D3748)),
+                      icon: Icon(
+                        Icons.chevron_right,
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
                     ),
                   ],
                 ),
@@ -382,7 +405,7 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
                           day,
                           style: TextStyle(
                             fontWeight: FontWeight.w600,
-                            color: Color(0xFF4A5568),
+                            color: Theme.of(context).colorScheme.onSurface,
                           ),
                         ),
                       ),
@@ -412,7 +435,7 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
                         child: Text(
                           'Cancel',
                           style: TextStyle(
-                            color: Color(0xFF4A5568),
+                            color: Theme.of(context).colorScheme.onSurface,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -431,7 +454,9 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
                           });
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Color(0xFF4ECDC4),
+                          backgroundColor: Theme.of(
+                            context,
+                          ).colorScheme.primary,
                           padding: EdgeInsets.symmetric(vertical: 12),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -462,7 +487,7 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
       width: double.infinity,
       padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Color(0xFFBDE5DF),
+        color: Theme.of(context).colorScheme.secondary.withOpacity(0.2),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
@@ -482,14 +507,18 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
                 width: double.infinity,
                 padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 decoration: BoxDecoration(
-                  color: isSelected ? Color(0xFF2D8A7A) : Colors.transparent,
+                  color: isSelected
+                      ? Theme.of(context).colorScheme.secondary
+                      : Colors.transparent,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(
                   children: [
                     Icon(
                       isSelected ? Icons.check : Icons.add,
-                      color: isSelected ? Colors.white : Color(0xFF2D3748),
+                      color: isSelected
+                          ? Colors.white
+                          : Theme.of(context).colorScheme.onSurface,
                       size: 20,
                     ),
                     SizedBox(width: 8),
@@ -497,14 +526,18 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
                       location == 'Custom'
                           ? Icons.edit_location_alt_outlined
                           : _getAddressIcon(location),
-                      color: isSelected ? Colors.white : Color(0xFF2D3748),
+                      color: isSelected
+                          ? Colors.white
+                          : Theme.of(context).colorScheme.onSurface,
                       size: 20,
                     ),
                     SizedBox(width: 8),
                     Text(
                       location,
                       style: TextStyle(
-                        color: isSelected ? Colors.white : Color(0xFF2D3748),
+                        color: isSelected
+                            ? Colors.white
+                            : Theme.of(context).colorScheme.onSurface,
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
                       ),
@@ -528,7 +561,7 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
       width: double.infinity,
       padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Color(0xFFBDE5DF),
+        color: Theme.of(context).colorScheme.secondary.withOpacity(0.2),
         borderRadius: BorderRadius.circular(20),
       ),
       child: TextField(
@@ -536,11 +569,14 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
         maxLines: 4,
         decoration: InputDecoration(
           hintText: 'Enter custom address',
-          hintStyle: TextStyle(color: Color(0xFF9CA3AF)),
+          hintStyle: TextStyle(color: Theme.of(context).hintColor),
           border: InputBorder.none,
           contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         ),
-        style: TextStyle(fontSize: 16, color: Color(0xFF2D3748)),
+        style: TextStyle(
+          fontSize: 16,
+          color: Theme.of(context).colorScheme.onSurface,
+        ),
       ),
     );
   }
@@ -550,7 +586,7 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
       width: double.infinity,
       padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Color(0xFFBDE5DF),
+        color: Theme.of(context).colorScheme.secondary.withOpacity(0.2),
         borderRadius: BorderRadius.circular(20),
       ),
       child: GestureDetector(
@@ -566,13 +602,13 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
               height: 24,
               decoration: BoxDecoration(
                 color: notifyBeforeDelivery
-                    ? Color(0xFF2D8A7A)
+                    ? Theme.of(context).colorScheme.secondary
                     : Colors.transparent,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: notifyBeforeDelivery
-                      ? Color(0xFF2D8A7A)
-                      : Color(0xFF2D3748),
+                      ? Theme.of(context).colorScheme.secondary
+                      : Theme.of(context).dividerColor,
                   width: 2,
                 ),
               ),
@@ -586,7 +622,7 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
                 'Notify 30 minutes before delivery',
                 style: TextStyle(
                   fontSize: 16,
-                  color: Color(0xFF2D3748),
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -679,7 +715,9 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
         width: 35,
         height: 35,
         decoration: BoxDecoration(
-          color: isSelected ? Color(0xFF4ECDC4) : Colors.transparent,
+          color: isSelected
+              ? Theme.of(context).colorScheme.primary
+              : Colors.transparent,
           shape: BoxShape.circle,
         ),
         child: Center(
@@ -689,10 +727,10 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
               fontSize: 16,
               fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
               color: isOtherMonth || isPast
-                  ? Color(0xFFCBD5E0)
+                  ? Theme.of(context).hintColor
                   : isSelected
                   ? Colors.white
-                  : Color(0xFF2D3748),
+                  : Theme.of(context).colorScheme.onSurface,
             ),
           ),
         ),
@@ -789,7 +827,7 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: Color(0xFF4ECDC4),
+        backgroundColor: Theme.of(context).colorScheme.primary,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         duration: Duration(seconds: 2),

@@ -278,12 +278,14 @@ class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
                 child: ElevatedButton(
                   onPressed: _isLoading ? null : _handleContinue,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFF2D5BFF),
+                    backgroundColor: Theme.of(context).colorScheme.primary,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
                     elevation: 0,
-                    shadowColor: Color(0xFF2D5BFF).withOpacity(0.3),
+                    shadowColor: Theme.of(
+                      context,
+                    ).colorScheme.primary.withOpacity(0.3),
                   ),
                   child: _isLoading
                       ? SizedBox(
@@ -299,7 +301,7 @@ class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
                       : Text(
                           'Continue to choose your plan',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: Theme.of(context).colorScheme.onPrimary,
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
                           ),
@@ -318,7 +320,7 @@ class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
     return Text(
       title,
       style: TextStyle(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.onSurface,
         fontSize: 20,
         fontWeight: FontWeight.w600,
       ),
@@ -330,9 +332,9 @@ class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
       width: double.infinity,
       padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Color(0xFF1A1A1A),
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.grey[800]!),
+        border: Border.all(color: Theme.of(context).dividerColor),
       ),
       child: Wrap(
         spacing: 16,
@@ -348,10 +350,14 @@ class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
-                color: isSelected ? Color(0xFF2D5BFF) : Colors.transparent,
+                color: isSelected
+                    ? Theme.of(context).colorScheme.primary
+                    : Colors.transparent,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: isSelected ? Color(0xFF2D5BFF) : Colors.grey[800]!,
+                  color: isSelected
+                      ? Theme.of(context).colorScheme.primary
+                      : Theme.of(context).dividerColor,
                 ),
               ),
               child: Row(
@@ -359,14 +365,20 @@ class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
                 children: [
                   Icon(
                     isSelected ? Icons.check : Icons.add,
-                    color: isSelected ? Colors.white : Colors.grey[400],
+                    color: isSelected
+                        ? Theme.of(context).colorScheme.onPrimary
+                        : Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withOpacity(0.7),
                     size: 20,
                   ),
                   SizedBox(width: 8),
                   Text(
                     duration,
                     style: TextStyle(
-                      color: isSelected ? Colors.white : Colors.white,
+                      color: isSelected
+                          ? Theme.of(context).colorScheme.onPrimary
+                          : Theme.of(context).colorScheme.onSurface,
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                     ),
@@ -409,10 +421,14 @@ class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
         width: 100,
         padding: EdgeInsets.symmetric(vertical: 16, horizontal: 12),
         decoration: BoxDecoration(
-          color: isSelected ? Color(0xFF2D5BFF) : Color(0xFF1A1A1A),
+          color: isSelected
+              ? Theme.of(context).colorScheme.primary
+              : Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isSelected ? Color(0xFF2D5BFF) : Colors.grey[800]!,
+            color: isSelected
+                ? Theme.of(context).colorScheme.primary
+                : Theme.of(context).dividerColor,
             width: 2,
           ),
         ),
@@ -422,7 +438,9 @@ class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
             Text(
               count.toString(),
               style: TextStyle(
-                color: isSelected ? Colors.white : Colors.white,
+                color: isSelected
+                    ? Theme.of(context).colorScheme.onPrimary
+                    : Theme.of(context).colorScheme.onSurface,
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
               ),
@@ -431,7 +449,9 @@ class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
             Text(
               count == 1 ? 'Meal' : 'Meals',
               style: TextStyle(
-                color: isSelected ? Colors.white : Colors.white,
+                color: isSelected
+                    ? Theme.of(context).colorScheme.onPrimary
+                    : Theme.of(context).colorScheme.onSurface,
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
               ),
@@ -447,9 +467,9 @@ class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
       width: double.infinity,
       padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Color(0xFF1A1A1A),
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.grey[800]!),
+        border: Border.all(color: Theme.of(context).dividerColor),
       ),
       child: Wrap(
         spacing: 16,
@@ -482,10 +502,14 @@ class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
-                color: isSelected ? Color(0xFF2D5BFF) : Colors.transparent,
+                color: isSelected
+                    ? Theme.of(context).colorScheme.primary
+                    : Colors.transparent,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: isSelected ? Color(0xFF2D5BFF) : Colors.grey[800]!,
+                  color: isSelected
+                      ? Theme.of(context).colorScheme.primary
+                      : Theme.of(context).dividerColor,
                 ),
               ),
               child: Row(
@@ -493,14 +517,20 @@ class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
                 children: [
                   Icon(
                     isSelected ? Icons.check : Icons.add,
-                    color: isSelected ? Colors.white : Colors.grey[400],
+                    color: isSelected
+                        ? Theme.of(context).colorScheme.onPrimary
+                        : Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withOpacity(0.7),
                     size: 20,
                   ),
                   SizedBox(width: 8),
                   Text(
                     mealType,
                     style: TextStyle(
-                      color: isSelected ? Colors.white : Colors.white,
+                      color: isSelected
+                          ? Theme.of(context).colorScheme.onPrimary
+                          : Theme.of(context).colorScheme.onSurface,
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                     ),
@@ -519,9 +549,9 @@ class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
       width: double.infinity,
       padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Color(0xFF1A1A1A),
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.grey[800]!),
+        border: Border.all(color: Theme.of(context).dividerColor),
       ),
       child: Column(
         spacing: 16,
@@ -537,24 +567,34 @@ class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
               width: double.infinity,
               padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
-                color: isSelected ? Color(0xFF2D5BFF) : Colors.transparent,
+                color: isSelected
+                    ? Theme.of(context).colorScheme.primary
+                    : Colors.transparent,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: isSelected ? Color(0xFF2D5BFF) : Colors.grey[800]!,
+                  color: isSelected
+                      ? Theme.of(context).colorScheme.primary
+                      : Theme.of(context).dividerColor,
                 ),
               ),
               child: Row(
                 children: [
                   Icon(
                     isSelected ? Icons.check : Icons.add,
-                    color: isSelected ? Colors.white : Colors.grey[400],
+                    color: isSelected
+                        ? Theme.of(context).colorScheme.onPrimary
+                        : Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withOpacity(0.7),
                     size: 20,
                   ),
                   SizedBox(width: 8),
                   Text(
                     '$plan day meal plan',
                     style: TextStyle(
-                      color: isSelected ? Colors.white : Colors.white,
+                      color: isSelected
+                          ? Theme.of(context).colorScheme.onPrimary
+                          : Theme.of(context).colorScheme.onSurface,
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                     ),
@@ -581,9 +621,9 @@ class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
             width: double.infinity,
             padding: EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: Color(0xFF1A1A1A),
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.grey[800]!),
+              border: Border.all(color: Theme.of(context).dividerColor),
             ),
             child: Row(
               children: [
@@ -594,8 +634,10 @@ class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
                         : 'Select start date',
                     style: TextStyle(
                       color: selectedDate == null
-                          ? Colors.grey[400]
-                          : Colors.white,
+                          ? Theme.of(
+                              context,
+                            ).colorScheme.onSurface.withOpacity(0.7)
+                          : Theme.of(context).colorScheme.onPrimary,
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                     ),
@@ -605,7 +647,9 @@ class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
                   showDatePicker
                       ? Icons.keyboard_arrow_up
                       : Icons.keyboard_arrow_down,
-                  color: Colors.grey[400],
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.7),
                   size: 24,
                 ),
               ],
@@ -617,9 +661,12 @@ class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
           Container(
             padding: EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: Color(0xFF1A1A1A),
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Color(0xFF2D5BFF), width: 2),
+              border: Border.all(
+                color: Theme.of(context).colorScheme.primary,
+                width: 2,
+              ),
             ),
             child: Column(
               children: [
@@ -636,14 +683,17 @@ class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
                           );
                         });
                       },
-                      icon: Icon(Icons.chevron_left, color: Colors.white),
+                      icon: Icon(
+                        Icons.chevron_left,
+                        color: Theme.of(context).colorScheme.onPrimary,
+                      ),
                     ),
                     Text(
                       '${_getMonthName(currentMonth.month)} ${currentMonth.year}',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
-                        color: Colors.white,
+                        color: Theme.of(context).colorScheme.onPrimary,
                       ),
                     ),
                     IconButton(
@@ -655,7 +705,10 @@ class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
                           );
                         });
                       },
-                      icon: Icon(Icons.chevron_right, color: Colors.white),
+                      icon: Icon(
+                        Icons.chevron_right,
+                        color: Theme.of(context).colorScheme.onPrimary,
+                      ),
                     ),
                   ],
                 ),
@@ -672,7 +725,9 @@ class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
                           day,
                           style: TextStyle(
                             fontWeight: FontWeight.w600,
-                            color: Colors.grey[400],
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurface.withOpacity(0.7),
                           ),
                         ),
                       ),
@@ -702,7 +757,9 @@ class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
                         child: Text(
                           'Cancel',
                           style: TextStyle(
-                            color: Colors.grey[400],
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurface.withOpacity(0.7),
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -721,7 +778,9 @@ class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
                           });
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Color(0xFF2D5BFF),
+                          backgroundColor: Theme.of(
+                            context,
+                          ).colorScheme.primary,
                           padding: EdgeInsets.symmetric(vertical: 12),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -731,7 +790,7 @@ class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
                         child: Text(
                           'OK',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: Theme.of(context).colorScheme.onPrimary,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -829,7 +888,9 @@ class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
         width: 35,
         height: 35,
         decoration: BoxDecoration(
-          color: isSelected ? Color(0xFF2D5BFF) : Colors.transparent,
+          color: isSelected
+              ? Theme.of(context).colorScheme.primary
+              : Colors.transparent,
           shape: BoxShape.circle,
         ),
         child: Center(
@@ -839,10 +900,10 @@ class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
               fontSize: 16,
               fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
               color: isOtherMonth || isPast
-                  ? Colors.grey[800]
+                  ? Theme.of(context).colorScheme.onSurface.withOpacity(0.7)
                   : isSelected
-                  ? Colors.white
-                  : Colors.white,
+                  ? Theme.of(context).colorScheme.onPrimary
+                  : Theme.of(context).colorScheme.onSurface,
             ),
           ),
         ),
@@ -873,9 +934,9 @@ class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
       width: double.infinity,
       padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Color(0xFF1A1A1A),
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.grey[800]!),
+        border: Border.all(color: Theme.of(context).dividerColor),
       ),
       child: Column(
         spacing: 16,
@@ -892,30 +953,44 @@ class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
                 width: double.infinity,
                 padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 decoration: BoxDecoration(
-                  color: isSelected ? Color(0xFF2D5BFF) : Colors.transparent,
+                  color: isSelected
+                      ? Theme.of(context).colorScheme.primary
+                      : Colors.transparent,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: isSelected ? Color(0xFF2D5BFF) : Colors.grey[800]!,
+                    color: isSelected
+                        ? Theme.of(context).colorScheme.primary
+                        : Theme.of(context).dividerColor,
                   ),
                 ),
                 child: Row(
                   children: [
                     Icon(
                       isSelected ? Icons.check : Icons.add,
-                      color: isSelected ? Colors.white : Colors.grey[400],
+                      color: isSelected
+                          ? Theme.of(context).colorScheme.onPrimary
+                          : Theme.of(
+                              context,
+                            ).colorScheme.onSurface.withOpacity(0.7),
                       size: 20,
                     ),
                     SizedBox(width: 8),
                     Icon(
                       _getAddressIcon(address),
-                      color: isSelected ? Colors.white : Colors.grey[400],
+                      color: isSelected
+                          ? Theme.of(context).colorScheme.onPrimary
+                          : Theme.of(
+                              context,
+                            ).colorScheme.onSurface.withOpacity(0.7),
                       size: 20,
                     ),
                     SizedBox(width: 8),
                     Text(
                       address,
                       style: TextStyle(
-                        color: isSelected ? Colors.white : Colors.white,
+                        color: isSelected
+                            ? Theme.of(context).colorScheme.onPrimary
+                            : Theme.of(context).colorScheme.onSurface,
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
                       ),
@@ -951,12 +1026,12 @@ class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
-          backgroundColor: Color(0xFF1A1A1A),
+          backgroundColor: Theme.of(context).colorScheme.surface,
           title: Text(
             'Subscription Summary',
             style: TextStyle(
               fontWeight: FontWeight.bold,
-              color: Color(0xFF2D5BFF),
+              color: Theme.of(context).colorScheme.primary,
             ),
           ),
           content: Column(
@@ -984,7 +1059,7 @@ class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
               child: Text(
                 'Continue',
                 style: TextStyle(
-                  color: Color(0xFF2D5BFF),
+                  color: Theme.of(context).colorScheme.primary,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -1003,13 +1078,16 @@ class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
           Text(
             '$label: ',
             style: TextStyle(
-              color: Colors.grey[400],
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
               fontWeight: FontWeight.w500,
             ),
           ),
           Text(
             value,
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurface,
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ],
       ),
@@ -1020,7 +1098,7 @@ class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: Color(0xFF2D5BFF),
+        backgroundColor: Theme.of(context).colorScheme.primary,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         duration: Duration(seconds: 2),

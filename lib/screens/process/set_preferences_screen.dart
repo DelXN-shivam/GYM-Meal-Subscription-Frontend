@@ -176,7 +176,7 @@ class _SetPreferencesScreenState extends State<SetPreferencesScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: Color(0xFF2D5BFF),
+        backgroundColor: Theme.of(context).colorScheme.primary,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         duration: Duration(seconds: 2),
@@ -193,7 +193,7 @@ class _SetPreferencesScreenState extends State<SetPreferencesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF0A0A0A),
+      backgroundColor: Theme.of(context).colorScheme.background,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.all(24),
@@ -209,7 +209,7 @@ class _SetPreferencesScreenState extends State<SetPreferencesScreen> {
                     },
                     icon: Icon(
                       Icons.arrow_back_ios_new_rounded,
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.onBackground,
                       size: 24,
                     ),
                     padding: EdgeInsets.zero,
@@ -233,7 +233,7 @@ class _SetPreferencesScreenState extends State<SetPreferencesScreen> {
               Text(
                 'Set Preferences',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.onBackground,
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
                 ),
@@ -242,7 +242,9 @@ class _SetPreferencesScreenState extends State<SetPreferencesScreen> {
               Text(
                 'Customize your meal plan preferences',
                 style: TextStyle(
-                  color: Colors.grey[400],
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.7),
                   fontSize: 16,
                   fontWeight: FontWeight.w400,
                 ),
@@ -280,12 +282,14 @@ class _SetPreferencesScreenState extends State<SetPreferencesScreen> {
                 child: ElevatedButton(
                   onPressed: _isLoading ? null : _handleGenerateMealPlan,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFF2D5BFF),
+                    backgroundColor: Theme.of(context).colorScheme.primary,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
                     elevation: 0,
-                    shadowColor: Color(0xFF2D5BFF).withOpacity(0.3),
+                    shadowColor: Theme.of(
+                      context,
+                    ).colorScheme.primary.withOpacity(0.3),
                   ),
                   child: _isLoading
                       ? SizedBox(
@@ -293,7 +297,7 @@ class _SetPreferencesScreenState extends State<SetPreferencesScreen> {
                           height: 28,
                           child: CircularProgressIndicator(
                             valueColor: AlwaysStoppedAnimation<Color>(
-                              Colors.white,
+                              Theme.of(context).colorScheme.onPrimary,
                             ),
                             strokeWidth: 3,
                           ),
@@ -301,7 +305,7 @@ class _SetPreferencesScreenState extends State<SetPreferencesScreen> {
                       : Text(
                           'Generate your meal plan',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: Theme.of(context).colorScheme.onPrimary,
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
                           ),
@@ -320,7 +324,7 @@ class _SetPreferencesScreenState extends State<SetPreferencesScreen> {
     return Text(
       title,
       style: TextStyle(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.onBackground,
         fontSize: 20,
         fontWeight: FontWeight.w600,
       ),
@@ -332,9 +336,9 @@ class _SetPreferencesScreenState extends State<SetPreferencesScreen> {
       width: double.infinity,
       padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Color(0xFF1A1A1A),
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.grey[800]!),
+        border: Border.all(color: Theme.of(context).dividerColor),
       ),
       child: Wrap(
         spacing: 16,
@@ -350,10 +354,14 @@ class _SetPreferencesScreenState extends State<SetPreferencesScreen> {
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
-                color: isSelected ? Color(0xFF2D5BFF) : Colors.transparent,
+                color: isSelected
+                    ? Theme.of(context).colorScheme.primary
+                    : Colors.transparent,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: isSelected ? Color(0xFF2D5BFF) : Colors.grey[800]!,
+                  color: isSelected
+                      ? Theme.of(context).colorScheme.primary
+                      : Theme.of(context).dividerColor,
                 ),
               ),
               child: Row(
@@ -361,14 +369,20 @@ class _SetPreferencesScreenState extends State<SetPreferencesScreen> {
                 children: [
                   Icon(
                     isSelected ? Icons.check : Icons.add,
-                    color: isSelected ? Colors.white : Colors.grey[400],
+                    color: isSelected
+                        ? Theme.of(context).colorScheme.onPrimary
+                        : Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withOpacity(0.7),
                     size: 20,
                   ),
                   SizedBox(width: 8),
                   Text(
                     getGoalDisplay(goal),
                     style: TextStyle(
-                      color: isSelected ? Colors.white : Colors.white,
+                      color: isSelected
+                          ? Theme.of(context).colorScheme.onPrimary
+                          : Theme.of(context).colorScheme.onSurface,
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                     ),
@@ -395,9 +409,9 @@ class _SetPreferencesScreenState extends State<SetPreferencesScreen> {
             width: double.infinity,
             padding: EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: Color(0xFF1A1A1A),
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.grey[800]!),
+              border: Border.all(color: Theme.of(context).dividerColor),
             ),
             child: Row(
               children: [
@@ -406,8 +420,10 @@ class _SetPreferencesScreenState extends State<SetPreferencesScreen> {
                     getActivityDisplay(selectedActivityLevel),
                     style: TextStyle(
                       color: selectedActivityLevel == 'Select activity level'
-                          ? Colors.grey[400]
-                          : Colors.white,
+                          ? Theme.of(
+                              context,
+                            ).colorScheme.onSurface.withOpacity(0.7)
+                          : Theme.of(context).colorScheme.onBackground,
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                     ),
@@ -417,7 +433,9 @@ class _SetPreferencesScreenState extends State<SetPreferencesScreen> {
                   isActivityDropdownExpanded
                       ? Icons.keyboard_arrow_up
                       : Icons.keyboard_arrow_down,
-                  color: Colors.grey[400],
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.7),
                   size: 24,
                 ),
               ],
@@ -429,9 +447,12 @@ class _SetPreferencesScreenState extends State<SetPreferencesScreen> {
           Container(
             width: double.infinity,
             decoration: BoxDecoration(
-              color: Color(0xFF1A1A1A),
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Color(0xFF2D5BFF), width: 2),
+              border: Border.all(
+                color: Theme.of(context).colorScheme.primary,
+                width: 2,
+              ),
             ),
             child: Column(
               children: activityLevels.map((level) {
@@ -450,7 +471,7 @@ class _SetPreferencesScreenState extends State<SetPreferencesScreen> {
                       border: !isLast
                           ? Border(
                               bottom: BorderSide(
-                                color: Colors.grey[800]!,
+                                color: Theme.of(context).dividerColor,
                                 width: 1,
                               ),
                             )
@@ -459,7 +480,7 @@ class _SetPreferencesScreenState extends State<SetPreferencesScreen> {
                     child: Text(
                       getActivityDisplay(level),
                       style: TextStyle(
-                        color: Colors.white,
+                        color: Theme.of(context).colorScheme.onBackground,
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
                       ),
@@ -479,9 +500,9 @@ class _SetPreferencesScreenState extends State<SetPreferencesScreen> {
       width: double.infinity,
       padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Color(0xFF1A1A1A),
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.grey[800]!),
+        border: Border.all(color: Theme.of(context).dividerColor),
       ),
       child: Wrap(
         spacing: 16,
@@ -501,10 +522,14 @@ class _SetPreferencesScreenState extends State<SetPreferencesScreen> {
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
-                color: isSelected ? Color(0xFF2D5BFF) : Colors.transparent,
+                color: isSelected
+                    ? Theme.of(context).colorScheme.primary
+                    : Colors.transparent,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: isSelected ? Color(0xFF2D5BFF) : Colors.grey[800]!,
+                  color: isSelected
+                      ? Theme.of(context).colorScheme.primary
+                      : Theme.of(context).dividerColor,
                 ),
               ),
               child: Row(
@@ -512,14 +537,20 @@ class _SetPreferencesScreenState extends State<SetPreferencesScreen> {
                 children: [
                   Icon(
                     isSelected ? Icons.check : Icons.add,
-                    color: isSelected ? Colors.white : Colors.grey[400],
+                    color: isSelected
+                        ? Theme.of(context).colorScheme.onPrimary
+                        : Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withOpacity(0.7),
                     size: 20,
                   ),
                   SizedBox(width: 8),
                   Text(
                     diet,
                     style: TextStyle(
-                      color: isSelected ? Colors.white : Colors.white,
+                      color: isSelected
+                          ? Theme.of(context).colorScheme.onPrimary
+                          : Theme.of(context).colorScheme.onSurface,
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                     ),
@@ -538,9 +569,9 @@ class _SetPreferencesScreenState extends State<SetPreferencesScreen> {
       width: double.infinity,
       padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Color(0xFF1A1A1A),
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.grey[800]!),
+        border: Border.all(color: Theme.of(context).dividerColor),
       ),
       child: Wrap(
         spacing: 16,
@@ -560,10 +591,14 @@ class _SetPreferencesScreenState extends State<SetPreferencesScreen> {
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
-                color: isSelected ? Color(0xFF2D5BFF) : Colors.transparent,
+                color: isSelected
+                    ? Theme.of(context).colorScheme.primary
+                    : Colors.transparent,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: isSelected ? Color(0xFF2D5BFF) : Colors.grey[800]!,
+                  color: isSelected
+                      ? Theme.of(context).colorScheme.primary
+                      : Theme.of(context).dividerColor,
                 ),
               ),
               child: Row(
@@ -571,14 +606,20 @@ class _SetPreferencesScreenState extends State<SetPreferencesScreen> {
                 children: [
                   Icon(
                     isSelected ? Icons.check : Icons.add,
-                    color: isSelected ? Colors.white : Colors.grey[400],
+                    color: isSelected
+                        ? Theme.of(context).colorScheme.onPrimary
+                        : Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withOpacity(0.7),
                     size: 20,
                   ),
                   SizedBox(width: 8),
                   Text(
                     allergy,
                     style: TextStyle(
-                      color: isSelected ? Colors.white : Colors.white,
+                      color: isSelected
+                          ? Theme.of(context).colorScheme.onPrimary
+                          : Theme.of(context).colorScheme.onSurface,
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                     ),

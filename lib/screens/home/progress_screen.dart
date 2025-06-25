@@ -9,22 +9,22 @@ class ProgressScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildHeader(),
+            _buildHeader(context),
             SizedBox(height: 30),
-            _buildProgressOverview(),
+            _buildProgressOverview(context),
             SizedBox(height: 30),
-            _buildWeightProgress(),
+            _buildWeightProgress(context),
             SizedBox(height: 30),
-            _buildWorkoutProgress(),
+            _buildWorkoutProgress(context),
             SizedBox(height: 30),
-            _buildAchievements(),
+            _buildAchievements(context),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -34,7 +34,7 @@ class ProgressScreen extends StatelessWidget {
             Text(
               'Progress',
               style: TextStyle(
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.onBackground,
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
               ),
@@ -42,7 +42,7 @@ class ProgressScreen extends StatelessWidget {
             Text(
               'Track your fitness journey',
               style: TextStyle(
-                color: Colors.grey[400],
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                 fontSize: 16,
                 fontWeight: FontWeight.w400,
               ),
@@ -52,29 +52,36 @@ class ProgressScreen extends StatelessWidget {
         Container(
           padding: EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: Color(0xFF1A1A1A),
+            color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.grey[800]!),
+            border: Border.all(color: Theme.of(context).dividerColor),
           ),
-          child: Icon(Icons.bar_chart, color: Colors.white, size: 24),
+          child: Icon(
+            Icons.bar_chart,
+            color: Theme.of(context).colorScheme.onBackground,
+            size: 24,
+          ),
         ),
       ],
     );
   }
 
-  Widget _buildProgressOverview() {
+  Widget _buildProgressOverview(BuildContext context) {
     return Container(
       padding: EdgeInsets.all(24),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFFFFAA00), Color(0xFFFF8C00)],
+          colors: [
+            Theme.of(context).colorScheme.primary,
+            Theme.of(context).colorScheme.secondary,
+          ],
         ),
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Color(0xFFFFAA00).withOpacity(0.3),
+            color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
             blurRadius: 20,
             offset: Offset(0, 10),
           ),
@@ -89,7 +96,7 @@ class ProgressScreen extends StatelessWidget {
               Text(
                 'This Month',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.onBackground,
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
@@ -97,13 +104,15 @@ class ProgressScreen extends StatelessWidget {
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
                   '+2.5 kg',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.onBackground,
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                   ),
@@ -115,14 +124,26 @@ class ProgressScreen extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: _buildProgressStat('Workouts', '18', 'Completed'),
+                child: _buildProgressStat(
+                  context,
+                  'Workouts',
+                  '18',
+                  'Completed',
+                ),
               ),
               SizedBox(width: 16),
               Expanded(
-                child: _buildProgressStat('Calories', '12,450', 'Burned'),
+                child: _buildProgressStat(
+                  context,
+                  'Calories',
+                  '12,450',
+                  'Burned',
+                ),
               ),
               SizedBox(width: 16),
-              Expanded(child: _buildProgressStat('Hours', '24', 'Active')),
+              Expanded(
+                child: _buildProgressStat(context, 'Hours', '24', 'Active'),
+              ),
             ],
           ),
         ],
@@ -130,14 +151,19 @@ class ProgressScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildProgressStat(String label, String value, String unit) {
+  Widget _buildProgressStat(
+    BuildContext context,
+    String label,
+    String value,
+    String unit,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           value,
           style: TextStyle(
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.onBackground,
             fontSize: 24,
             fontWeight: FontWeight.bold,
           ),
@@ -145,7 +171,7 @@ class ProgressScreen extends StatelessWidget {
         Text(
           unit,
           style: TextStyle(
-            color: Colors.white.withOpacity(0.8),
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
             fontSize: 12,
             fontWeight: FontWeight.w500,
           ),
@@ -153,7 +179,7 @@ class ProgressScreen extends StatelessWidget {
         Text(
           label,
           style: TextStyle(
-            color: Colors.white.withOpacity(0.8),
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
             fontSize: 12,
             fontWeight: FontWeight.w500,
           ),
@@ -162,7 +188,7 @@ class ProgressScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildWeightProgress() {
+  Widget _buildWeightProgress(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -172,7 +198,7 @@ class ProgressScreen extends StatelessWidget {
             Text(
               'Weight Progress',
               style: TextStyle(
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.onBackground,
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
@@ -182,7 +208,7 @@ class ProgressScreen extends StatelessWidget {
               child: Text(
                 'View Chart',
                 style: TextStyle(
-                  color: Color(0xFF2D5BFF),
+                  color: Theme.of(context).colorScheme.primary,
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                 ),
@@ -194,25 +220,42 @@ class ProgressScreen extends StatelessWidget {
         Container(
           padding: EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: Color(0xFF1A1A1A),
+            color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.grey[800]!),
+            border: Border.all(color: Theme.of(context).dividerColor),
           ),
           child: Column(
             children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _buildWeightItem('Start', '82.5 kg', Colors.grey[400]!),
-                  _buildWeightItem('Current', '85.0 kg', Color(0xFF00FF88)),
-                  _buildWeightItem('Goal', '80.0 kg', Color(0xFF2D5BFF)),
+                  _buildWeightItem(
+                    context,
+                    'Start',
+                    '82.5 kg',
+                    Theme.of(context).colorScheme.onSurface.withOpacity(0.2),
+                  ),
+                  _buildWeightItem(
+                    context,
+                    'Current',
+                    '85.0 kg',
+                    Theme.of(context).colorScheme.primary,
+                  ),
+                  _buildWeightItem(
+                    context,
+                    'Goal',
+                    '80.0 kg',
+                    Theme.of(context).colorScheme.secondary,
+                  ),
                 ],
               ),
               SizedBox(height: 20),
               Container(
                 height: 8,
                 decoration: BoxDecoration(
-                  color: Colors.grey[800],
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: FractionallySizedBox(
@@ -221,7 +264,10 @@ class ProgressScreen extends StatelessWidget {
                   child: Container(
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
-                        colors: [Color(0xFF00FF88), Color(0xFF2D5BFF)],
+                        colors: [
+                          Theme.of(context).colorScheme.primary,
+                          Theme.of(context).colorScheme.secondary,
+                        ],
                       ),
                       borderRadius: BorderRadius.circular(4),
                     ),
@@ -232,7 +278,9 @@ class ProgressScreen extends StatelessWidget {
               Text(
                 '60% to goal',
                 style: TextStyle(
-                  color: Colors.grey[400],
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.7),
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
                 ),
@@ -244,7 +292,12 @@ class ProgressScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildWeightItem(String label, String weight, Color color) {
+  Widget _buildWeightItem(
+    BuildContext context,
+    String label,
+    String weight,
+    Color color,
+  ) {
     return Column(
       children: [
         Text(
@@ -258,7 +311,7 @@ class ProgressScreen extends StatelessWidget {
         Text(
           label,
           style: TextStyle(
-            color: Colors.grey[400],
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
             fontSize: 12,
             fontWeight: FontWeight.w500,
           ),
@@ -267,39 +320,48 @@ class ProgressScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildWorkoutProgress() {
+  Widget _buildWorkoutProgress(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'Workout Progress',
           style: TextStyle(
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.onBackground,
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
         ),
         SizedBox(height: 16),
         _buildWorkoutProgressItem(
+          context,
           'Strength Training',
           '12/15',
           '80%',
-          Color(0xFF00FF88),
+          Theme.of(context).colorScheme.primary,
         ),
         SizedBox(height: 12),
-        _buildWorkoutProgressItem('Cardio', '8/10', '80%', Color(0xFFFFAA00)),
+        _buildWorkoutProgressItem(
+          context,
+          'Cardio',
+          '8/10',
+          '80%',
+          Theme.of(context).colorScheme.secondary,
+        ),
         SizedBox(height: 12),
         _buildWorkoutProgressItem(
+          context,
           'Flexibility',
           '5/8',
           '62%',
-          Color(0xFF9C27B0),
+          Theme.of(context).colorScheme.error,
         ),
       ],
     );
   }
 
   Widget _buildWorkoutProgressItem(
+    BuildContext context,
     String name,
     String progress,
     String percentage,
@@ -313,9 +375,9 @@ class ProgressScreen extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Color(0xFF1A1A1A),
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey[800]!),
+        border: Border.all(color: Theme.of(context).dividerColor),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -326,7 +388,7 @@ class ProgressScreen extends StatelessWidget {
               Text(
                 name,
                 style: TextStyle(
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.onBackground,
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                 ),
@@ -345,7 +407,7 @@ class ProgressScreen extends StatelessWidget {
           Container(
             height: 6,
             decoration: BoxDecoration(
-              color: Colors.grey[800],
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.2),
               borderRadius: BorderRadius.circular(3),
             ),
             child: FractionallySizedBox(
@@ -363,7 +425,7 @@ class ProgressScreen extends StatelessWidget {
           Text(
             progress,
             style: TextStyle(
-              color: Colors.grey[400],
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
               fontSize: 12,
               fontWeight: FontWeight.w500,
             ),
@@ -373,7 +435,7 @@ class ProgressScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildAchievements() {
+  Widget _buildAchievements(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -391,6 +453,7 @@ class ProgressScreen extends StatelessWidget {
           child: Row(
             children: [
               _buildAchievementCard(
+                context,
                 'First Workout',
                 'Completed your first workout',
                 Icons.fitness_center,
@@ -398,6 +461,7 @@ class ProgressScreen extends StatelessWidget {
               ),
               SizedBox(width: 16),
               _buildAchievementCard(
+                context,
                 'Weight Goal',
                 'Lost 2.5 kg this month',
                 Icons.trending_down,
@@ -405,6 +469,7 @@ class ProgressScreen extends StatelessWidget {
               ),
               SizedBox(width: 16),
               _buildAchievementCard(
+                context,
                 'Consistency',
                 '7 days in a row',
                 Icons.local_fire_department,
@@ -418,6 +483,7 @@ class ProgressScreen extends StatelessWidget {
   }
 
   Widget _buildAchievementCard(
+    BuildContext context,
     String title,
     String description,
     IconData icon,
@@ -427,9 +493,9 @@ class ProgressScreen extends StatelessWidget {
       width: 200,
       padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Color(0xFF1A1A1A),
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey[800]!),
+        border: Border.all(color: Theme.of(context).dividerColor),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -446,7 +512,7 @@ class ProgressScreen extends StatelessWidget {
           Text(
             title,
             style: TextStyle(
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.onBackground,
               fontSize: 16,
               fontWeight: FontWeight.bold,
             ),
@@ -454,7 +520,10 @@ class ProgressScreen extends StatelessWidget {
           SizedBox(height: 8),
           Text(
             description,
-            style: TextStyle(color: Colors.grey[400], fontSize: 14),
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+              fontSize: 14,
+            ),
           ),
         ],
       ),

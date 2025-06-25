@@ -3,8 +3,35 @@ import 'package:gym_app_user_1/config/routes.dart';
 import 'package:gym_app_user_1/screens/profile/edit_profile.dart';
 import 'package:provider/provider.dart';
 import 'package:gym_app_user_1/providers/profile_data_provider.dart';
+import 'package:gym_app_user_1/services/local_storage_service.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  String? _username;
+  String? _email;
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserInfo();
+  }
+
+  Future<void> _loadUserInfo() async {
+    final localStorage = LocalStorageService();
+    final username = await localStorage.getUsername();
+    final email = await localStorage.getMongoEmail();
+    setState(() {
+      _username = username;
+      _email = email;
+      _loading = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -19,13 +46,13 @@ class ProfileScreen extends StatelessWidget {
             SizedBox(height: 20),
             _buildProfileCard(context),
             SizedBox(height: 24),
-            _buildQuickStats(),
+            _buildQuickStats(context),
             SizedBox(height: 24),
-            _buildHealthMetrics(),
+            _buildHealthMetrics(context),
             SizedBox(height: 24),
-            _buildWorkoutProgress(),
+            _buildWorkoutProgress(context),
             SizedBox(height: 24),
-            _buildSettingsSection(),
+            _buildSettingsSection(context),
             SizedBox(height: 40),
           ],
         ),
@@ -43,7 +70,7 @@ class ProfileScreen extends StatelessWidget {
             Text(
               'Profile',
               style: TextStyle(
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.onBackground,
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
               ),
@@ -51,7 +78,7 @@ class ProfileScreen extends StatelessWidget {
             Text(
               'Manage your account & settings',
               style: TextStyle(
-                color: Colors.grey[400],
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                 fontSize: 16,
                 fontWeight: FontWeight.w400,
               ),
@@ -64,11 +91,15 @@ class ProfileScreen extends StatelessWidget {
           child: Container(
             padding: EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Color(0xFF1A1A1A),
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.grey[800]!),
+              border: Border.all(color: Theme.of(context).dividerColor),
             ),
-            child: Icon(Icons.edit_note, color: Colors.white, size: 24),
+            child: Icon(
+              Icons.edit_note,
+              color: Theme.of(context).colorScheme.primary,
+              size: 24,
+            ),
           ),
         ),
       ],
@@ -94,7 +125,7 @@ class ProfileScreen extends StatelessWidget {
         Text(
           'Profile Completion',
           style: TextStyle(
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.onBackground,
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
@@ -105,7 +136,7 @@ class ProfileScreen extends StatelessWidget {
             Container(
               height: 10,
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.1),
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
@@ -113,7 +144,7 @@ class ProfileScreen extends StatelessWidget {
               height: 10,
               width: MediaQuery.of(context).size.width * percent,
               decoration: BoxDecoration(
-                color: Color(0xFF2D5BFF),
+                color: Theme.of(context).colorScheme.primary,
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
@@ -125,12 +156,15 @@ class ProfileScreen extends StatelessWidget {
           children: [
             Text(
               '${(percent * 100).toInt()}% completed',
-              style: TextStyle(color: Colors.white, fontSize: 14),
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onBackground,
+                fontSize: 14,
+              ),
             ),
             Text(
               steps[currentStep.clamp(0, steps.length - 1)]['label'] as String,
               style: TextStyle(
-                color: Color(0xFF2D5BFF),
+                color: Theme.of(context).colorScheme.primary,
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
               ),
@@ -151,16 +185,18 @@ class ProfileScreen extends StatelessWidget {
                       CircleAvatar(
                         radius: 14,
                         backgroundColor: isCompleted
-                            ? Color(0xFF00FF88)
+                            ? Theme.of(context).colorScheme.primary
                             : isCurrent
-                            ? Color(0xFF2D5BFF)
-                            : Color(0xFF232323),
+                            ? Theme.of(context).colorScheme.primary
+                            : Theme.of(context).colorScheme.surface,
                         child: Icon(
                           steps[index]['icon'] as IconData,
                           size: 16,
                           color: isCompleted || isCurrent
-                              ? Colors.white
-                              : Colors.grey[500],
+                              ? Theme.of(context).colorScheme.onPrimary
+                              : Theme.of(
+                                  context,
+                                ).colorScheme.onSurface.withOpacity(0.5),
                         ),
                       ),
                       SizedBox(height: 4),
@@ -168,8 +204,10 @@ class ProfileScreen extends StatelessWidget {
                         steps[index]['label'] as String,
                         style: TextStyle(
                           color: isCompleted || isCurrent
-                              ? Colors.white
-                              : Colors.grey[500],
+                              ? Theme.of(context).colorScheme.onPrimary
+                              : Theme.of(
+                                  context,
+                                ).colorScheme.onSurface.withOpacity(0.5),
                           fontSize: 10,
                           fontWeight: isCurrent
                               ? FontWeight.bold
@@ -183,8 +221,8 @@ class ProfileScreen extends StatelessWidget {
                       width: 18,
                       height: 2,
                       color: isCompleted
-                          ? Color(0xFF00FF88)
-                          : Color(0xFF232323),
+                          ? Theme.of(context).colorScheme.primary
+                          : Theme.of(context).colorScheme.surface,
                     ),
                 ],
               );
@@ -202,12 +240,15 @@ class ProfileScreen extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFF2D5BFF), Color(0xFF1A42CC)],
+          colors: [
+            Theme.of(context).colorScheme.primary,
+            Theme.of(context).colorScheme.secondary,
+          ],
         ),
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Color(0xFF2D5BFF).withOpacity(0.3),
+            color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
             blurRadius: 20,
             offset: Offset(0, 10),
           ),
@@ -220,7 +261,9 @@ class ProfileScreen extends StatelessWidget {
               Container(
                 padding: EdgeInsets.all(4),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onPrimary.withOpacity(0.2),
                   shape: BoxShape.circle,
                 ),
                 child: CircleAvatar(
@@ -245,17 +288,21 @@ class ProfileScreen extends StatelessWidget {
                   child: Container(
                     padding: EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.surface,
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.2),
+                          color: Theme.of(context).shadowColor.withOpacity(0.2),
                           blurRadius: 8,
                           offset: Offset(0, 2),
                         ),
                       ],
                     ),
-                    child: Icon(Icons.edit, color: Color(0xFF2D5BFF), size: 16),
+                    child: Icon(
+                      Icons.edit,
+                      color: Theme.of(context).colorScheme.primary,
+                      size: 16,
+                    ),
                   ),
                 ),
               ),
@@ -263,18 +310,18 @@ class ProfileScreen extends StatelessWidget {
           ),
           SizedBox(height: 20),
           Text(
-            'Jamie Nelson',
+            _loading ? '...' : (_username ?? 'User'),
             style: TextStyle(
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.onPrimary,
               fontSize: 24,
               fontWeight: FontWeight.bold,
             ),
           ),
           SizedBox(height: 8),
           Text(
-            'jamienelson12@gmail.com',
+            _loading ? '...' : (_email ?? ''),
             style: TextStyle(
-              color: Colors.white.withOpacity(0.8),
+              color: Theme.of(context).colorScheme.onPrimary.withOpacity(0.8),
               fontSize: 14,
             ),
           ),
@@ -285,7 +332,8 @@ class ProfileScreen extends StatelessWidget {
                 child: _buildContactItem(
                   Icons.message,
                   'jamieNelson234',
-                  Color(0xFF00FF88),
+                  Theme.of(context).colorScheme.primary,
+                  context,
                 ),
               ),
               SizedBox(width: 16),
@@ -293,7 +341,8 @@ class ProfileScreen extends StatelessWidget {
                 child: _buildContactItem(
                   Icons.phone,
                   '+91-8134258374',
-                  Color(0xFF00FF88),
+                  Theme.of(context).colorScheme.primary,
+                  context,
                 ),
               ),
             ],
@@ -303,11 +352,16 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildContactItem(IconData icon, String text, Color color) {
+  Widget _buildContactItem(
+    IconData icon,
+    String text,
+    Color color,
+    BuildContext context,
+  ) {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.1),
+        color: Theme.of(context).colorScheme.surface.withOpacity(0.1),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
@@ -318,7 +372,7 @@ class ProfileScreen extends StatelessWidget {
             child: Text(
               text,
               style: TextStyle(
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.onSurface,
                 fontSize: 12,
                 fontWeight: FontWeight.w500,
               ),
@@ -330,13 +384,13 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildQuickStats() {
+  Widget _buildQuickStats(BuildContext context) {
     return Container(
       padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Color(0xFF1A1A1A),
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey[800]!),
+        border: Border.all(color: Theme.of(context).dividerColor),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -344,7 +398,7 @@ class ProfileScreen extends StatelessWidget {
           Text(
             'Quick Stats',
             style: TextStyle(
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.onSurface,
               fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
@@ -357,7 +411,8 @@ class ProfileScreen extends StatelessWidget {
                   '85 Kg',
                   'Current Weight',
                   Icons.monitor_weight,
-                  Color(0xFF00FF88),
+                  Theme.of(context).colorScheme.primary,
+                  context,
                 ),
               ),
               SizedBox(width: 12),
@@ -366,7 +421,8 @@ class ProfileScreen extends StatelessWidget {
                   '1/3',
                   'Current Workout',
                   Icons.fitness_center,
-                  Color(0xFFFFAA00),
+                  Theme.of(context).colorScheme.secondary,
+                  context,
                 ),
               ),
               SizedBox(width: 12),
@@ -375,7 +431,8 @@ class ProfileScreen extends StatelessWidget {
                   'Apr 01',
                   'Latest Progress',
                   Icons.photo_camera,
-                  Color(0xFFFF5555),
+                  Theme.of(context).colorScheme.error,
+                  context,
                 ),
               ),
             ],
@@ -390,6 +447,7 @@ class ProfileScreen extends StatelessWidget {
     String label,
     IconData icon,
     Color color,
+    BuildContext context,
   ) {
     return Container(
       padding: EdgeInsets.all(16),
@@ -405,7 +463,7 @@ class ProfileScreen extends StatelessWidget {
           Text(
             value,
             style: TextStyle(
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.onSurface,
               fontSize: 16,
               fontWeight: FontWeight.bold,
             ),
@@ -415,7 +473,7 @@ class ProfileScreen extends StatelessWidget {
             label,
             textAlign: TextAlign.center,
             style: TextStyle(
-              color: Colors.grey[400],
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
               fontSize: 11,
               fontWeight: FontWeight.w500,
             ),
@@ -427,13 +485,13 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildHealthMetrics() {
+  Widget _buildHealthMetrics(BuildContext context) {
     return Container(
       padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Color(0xFF1A1A1A),
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey[800]!),
+        border: Border.all(color: Theme.of(context).dividerColor),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -441,7 +499,7 @@ class ProfileScreen extends StatelessWidget {
           Text(
             'Health Metrics',
             style: TextStyle(
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.onSurface,
               fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
@@ -454,6 +512,7 @@ class ProfileScreen extends StatelessWidget {
                   'Sep 05',
                   'Latest Measurement',
                   Icons.straighten,
+                  context,
                 ),
               ),
               SizedBox(width: 12),
@@ -462,6 +521,7 @@ class ProfileScreen extends StatelessWidget {
                   '0',
                   'Steps Today',
                   Icons.directions_walk,
+                  context,
                 ),
               ),
               SizedBox(width: 12),
@@ -470,6 +530,7 @@ class ProfileScreen extends StatelessWidget {
                   '120 bpm',
                   'Heart Rate',
                   Icons.favorite,
+                  context,
                 ),
               ),
             ],
@@ -479,22 +540,28 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildMetricItem(String value, String label, IconData icon) {
+  Widget _buildMetricItem(
+    String value,
+    String label,
+    IconData icon,
+    BuildContext context,
+  ) {
+    final color = Theme.of(context).colorScheme.primary;
     return Container(
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Color(0xFF2D5BFF).withOpacity(0.1),
+        color: color.withOpacity(0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Color(0xFF2D5BFF).withOpacity(0.3)),
+        border: Border.all(color: color.withOpacity(0.3)),
       ),
       child: Column(
         children: [
-          Icon(icon, color: Color(0xFF2D5BFF), size: 20),
+          Icon(icon, color: color, size: 20),
           SizedBox(height: 8),
           Text(
             value,
             style: TextStyle(
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.onSurface,
               fontSize: 16,
               fontWeight: FontWeight.bold,
             ),
@@ -504,7 +571,7 @@ class ProfileScreen extends StatelessWidget {
             label,
             textAlign: TextAlign.center,
             style: TextStyle(
-              color: Colors.grey[400],
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
               fontSize: 11,
               fontWeight: FontWeight.w500,
             ),
@@ -516,13 +583,13 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildWorkoutProgress() {
+  Widget _buildWorkoutProgress(BuildContext context) {
     return Container(
       padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Color(0xFF1A1A1A),
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey[800]!),
+        border: Border.all(color: Theme.of(context).dividerColor),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -533,7 +600,7 @@ class ProfileScreen extends StatelessWidget {
               Text(
                 'Current Workout Plan',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
@@ -541,13 +608,13 @@ class ProfileScreen extends StatelessWidget {
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: Color(0xFF2D5BFF),
+                  color: Theme.of(context).colorScheme.primary,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
                   '2',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.onPrimary,
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                   ),
@@ -559,15 +626,17 @@ class ProfileScreen extends StatelessWidget {
           _buildWorkoutProgressItem(
             'Morning Workout',
             '0/5',
-            Color(0xFF00FF88),
+            Theme.of(context).colorScheme.primary,
             Icons.wb_sunny,
+            context,
           ),
           SizedBox(height: 12),
           _buildWorkoutProgressItem(
             'Cardio Workout',
             '2/6',
-            Color(0xFF2D5BFF),
+            Theme.of(context).colorScheme.secondary,
             Icons.directions_run,
+            context,
           ),
         ],
       ),
@@ -579,6 +648,7 @@ class ProfileScreen extends StatelessWidget {
     String progress,
     Color color,
     IconData icon,
+    BuildContext context,
   ) {
     final parts = progress.split('/');
     final current = int.parse(parts[0]);
@@ -610,7 +680,7 @@ class ProfileScreen extends StatelessWidget {
                 Text(
                   title,
                   style: TextStyle(
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                   ),
@@ -619,7 +689,7 @@ class ProfileScreen extends StatelessWidget {
                 Container(
                   height: 4,
                   decoration: BoxDecoration(
-                    color: Colors.grey[800],
+                    color: Theme.of(context).dividerColor,
                     borderRadius: BorderRadius.circular(2),
                   ),
                   child: FractionallySizedBox(
@@ -646,7 +716,7 @@ class ProfileScreen extends StatelessWidget {
             child: Text(
               progress,
               style: TextStyle(
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.onPrimary,
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
               ),
@@ -657,7 +727,7 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSettingsSection() {
+  Widget _buildSettingsSection(BuildContext context) {
     final settings = [
       {
         'icon': Icons.notifications,
@@ -683,9 +753,9 @@ class ProfileScreen extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Color(0xFF1A1A1A),
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey[800]!),
+        border: Border.all(color: Theme.of(context).dividerColor),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -693,7 +763,7 @@ class ProfileScreen extends StatelessWidget {
           Text(
             'Settings',
             style: TextStyle(
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.onSurface,
               fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
@@ -709,6 +779,7 @@ class ProfileScreen extends StatelessWidget {
                 item['icon'] as IconData,
                 item['title'] as String,
                 item['subtitle'] as String,
+                context,
               );
             },
           ),
@@ -717,7 +788,12 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSettingsItem(IconData icon, String title, String subtitle) {
+  Widget _buildSettingsItem(
+    IconData icon,
+    String title,
+    String subtitle,
+    BuildContext context,
+  ) {
     return Container(
       margin: EdgeInsets.only(bottom: 12),
       child: Material(
@@ -730,12 +806,18 @@ class ProfileScreen extends StatelessWidget {
           child: Container(
             padding: EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.grey[900],
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(12),
             ),
             child: Row(
               children: [
-                Icon(icon, color: Colors.grey[400], size: 20),
+                Icon(
+                  icon,
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.7),
+                  size: 20,
+                ),
                 SizedBox(width: 16),
                 Expanded(
                   child: Column(
@@ -744,19 +826,30 @@ class ProfileScreen extends StatelessWidget {
                       Text(
                         title,
                         style: TextStyle(
-                          color: Colors.white,
+                          color: Theme.of(context).colorScheme.onSurface,
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
                       Text(
                         subtitle,
-                        style: TextStyle(color: Colors.grey[400], fontSize: 12),
+                        style: TextStyle(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withOpacity(0.7),
+                          fontSize: 12,
+                        ),
                       ),
                     ],
                   ),
                 ),
-                Icon(Icons.chevron_right, color: Colors.grey[400], size: 20),
+                Icon(
+                  Icons.chevron_right,
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.7),
+                  size: 20,
+                ),
               ],
             ),
           ),

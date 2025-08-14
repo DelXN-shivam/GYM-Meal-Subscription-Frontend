@@ -16,6 +16,18 @@ class _SubscriptionPlansPageState extends State<SubscriptionPlansPage> {
   int? selectedPlan; // 0 for weekly, 1 for monthly
 
   @override
+  void initState() {
+    super.initState();
+    final profileProvider = Provider.of<ProfileDataProvider>(
+      context,
+      listen: false,
+    );
+    if (profileProvider.subscriptionType != null) {
+      selectedPlan = profileProvider.subscriptionType == 'Weekly' ? 0 : 1;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(0xFF0A0A0A),
@@ -400,7 +412,9 @@ class _SubscriptionPlansPageState extends State<SubscriptionPlansPage> {
     //   AppRoutes.profile,
     //   (route) => false,
     // );
-    Navigator.pop(context);
+    if (mounted) {
+      Navigator.pop(context);
+    }
   }
 
   void _showCheckoutDialog(String planName, String price) {

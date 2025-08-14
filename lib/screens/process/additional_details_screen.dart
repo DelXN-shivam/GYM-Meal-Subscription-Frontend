@@ -41,6 +41,20 @@ class _AdditionalDetailsScreenState extends State<AdditionalDetailsScreen> {
   void initState() {
     super.initState();
     _loadMongoId();
+    final profileProvider = Provider.of<ProfileDataProvider>(
+      context,
+      listen: false,
+    );
+    ageController.text = profileProvider.age?.toString() ?? '';
+    heightController.text = profileProvider.height?.toString() ?? '';
+    weightController.text = profileProvider.weight?.toString() ?? '';
+    selectedGender = profileProvider.gender != null
+        ? profileProvider.gender![0].toUpperCase() +
+              profileProvider.gender!.substring(1)
+        : null;
+    homeAddressController.text = profileProvider.homeAddress ?? '';
+    officeAddressController.text = profileProvider.officeAddress ?? '';
+    collegeAddressController.text = profileProvider.collegeAddress ?? '';
   }
 
   void _loadMongoId() async {
@@ -75,15 +89,30 @@ class _AdditionalDetailsScreenState extends State<AdditionalDetailsScreen> {
       if (mongoId.isEmpty) {
         throw Exception('User ID not found. Please try again.');
       }
+      // final backendResponse = await http.put(
+      //   Uri.parse(
+      //     'https://gym-meal-subscription-backend.vercel.app/api/v1/user/update/${mongoId}',
+      //   ),
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //     'Accept': 'application/json',
+      //   },
+      //   body: json.encode({
+      // 'age': ageController.text.trim(),
+      // 'weight': weightController.text.trim(),
+      // 'height': heightController.text.trim(),
+      // "gender": selectedGender!.toLowerCase(),
+      // "homeAddress": homeAddressController.text.trim(),
+      // "officeAddress": officeAddressController.text.trim(),
+      // "collegeAddress": collegeAddressController.text.trim(),
+      //   }),
+      // );
       final backendResponse = await http.patch(
         Uri.parse(
           'https://gym-meal-subscription-backend.vercel.app/api/v1/user/update/${mongoId}',
         ),
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-        body: json.encode({
+        headers: {"Content-Type": 'application/json'},
+        body: jsonEncode({
           'age': ageController.text.trim(),
           'weight': weightController.text.trim(),
           'height': heightController.text.trim(),
@@ -93,6 +122,7 @@ class _AdditionalDetailsScreenState extends State<AdditionalDetailsScreen> {
           "collegeAddress": collegeAddressController.text.trim(),
         }),
       );
+
       // log('Update response status: ${backendResponse.statusCode}');
       // log('Update response body: ${backendResponse.body}');
       if (backendResponse.statusCode == 200 ||
@@ -120,6 +150,12 @@ class _AdditionalDetailsScreenState extends State<AdditionalDetailsScreen> {
 
         // Navigator.pushNamed(context, AppRoutes.setPreferences);
 
+        // Navigator.push(
+        //   context,
+        //   MaterialPageRoute(
+        //     builder: (context) => SetPreferencesScreen(mongoId: mongoId),
+        //   ),
+        // );
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -257,7 +293,7 @@ class _AdditionalDetailsScreenState extends State<AdditionalDetailsScreen> {
                             validator: (value) {
                               if (value?.isEmpty ?? true)
                                 return 'Height is required';
-                              int? height = int.tryParse(value!);
+                              num? height = num.tryParse(value!);
                               if (height == null)
                                 return 'Please enter a valid height';
                               if (height < 100 || height > 250)
@@ -284,7 +320,7 @@ class _AdditionalDetailsScreenState extends State<AdditionalDetailsScreen> {
                             validator: (value) {
                               if (value?.isEmpty ?? true)
                                 return 'Weight is required';
-                              int? weight = int.tryParse(value!);
+                              num? weight = num.tryParse(value!);
                               if (weight == null)
                                 return 'Please enter a valid weight';
                               if (weight < 30 || weight > 200)

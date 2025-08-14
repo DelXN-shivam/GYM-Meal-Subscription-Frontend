@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:gym_app_user_1/config/routes.dart';
 import 'package:gym_app_user_1/providers/auth_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:gym_app_user_1/providers/profile_data_provider.dart';
+import 'package:gym_app_user_1/services/local_storage_service.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -43,12 +47,32 @@ class _SplashScreenState extends State<SplashScreen>
     // Navigate to appropriate screen after animation
     Future.delayed(const Duration(seconds: 3), () async {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final profileProvider = Provider.of<ProfileDataProvider>(
+        context,
+        listen: false,
+      );
       final isLoggedIn = await authProvider.checkLoginStatus();
 
       if (mounted) {
         if (isLoggedIn) {
-          // Initialize user data before navigation
-          await authProvider.initializeUser();
+          // Fetch user data from API and update profile provider
+          final localStorage = LocalStorageService();
+          final mongoId = await localStorage.getMongoId();
+          if (mongoId != null && mongoId.isNotEmpty) {
+            final url =
+                'https://gym-meal-subscription-backend.vercel.app/api/v1/user/get/$mongoId';
+            try {
+              final response = await http.get(Uri.parse(url));
+              if (response.statusCode == 200) {
+                final data = json.decode(response.body);
+                if (data['user'] != null) {
+                  profileProvider.updateFromUserJson(data['user']);
+                }
+              }
+            } catch (e) {
+              // Handle error (optional: show error or log)
+            }
+          }
           Navigator.pushReplacementNamed(context, AppRoutes.home);
         } else {
           Navigator.pushReplacementNamed(context, AppRoutes.login);

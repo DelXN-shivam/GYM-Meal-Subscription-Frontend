@@ -1,9 +1,13 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:gym_app_user_1/config/routes.dart';
 import 'package:gym_app_user_1/screens/profile/edit_profile.dart';
 import 'package:provider/provider.dart';
 import 'package:gym_app_user_1/providers/profile_data_provider.dart';
 import 'package:gym_app_user_1/services/local_storage_service.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class ProfileScreen extends StatefulWidget {
   @override
@@ -13,6 +17,7 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   String? _username;
   String? _email;
+  String? _mongoId;
   bool _loading = true;
 
   @override
@@ -22,39 +27,311 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _loadUserInfo() async {
-    final localStorage = LocalStorageService();
-    final username = await localStorage.getUsername();
-    final email = await localStorage.getMongoEmail();
-    setState(() {
-      _username = username;
-      _email = email;
-      _loading = false;
-    });
+    try {
+      final localStorage = LocalStorageService();
+      final username = await localStorage.getUsername();
+      final email = await localStorage.getMongoEmail();
+      setState(() {
+        _username = username;
+        _email = email;
+        _loading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _username = null;
+        _email = null;
+        _loading = false;
+      });
+      // Optionally log error
+    }
+  }
+
+  Future<void> _refreshProfileData() async {
+    try {
+      await _loadUserInfo(); // reload local info
+      final localStorage = LocalStorageService();
+      final mongoId = await localStorage.getMongoId();
+      if (mongoId != null && mongoId.isNotEmpty) {
+        final url =
+            'https://gym-meal-subscription-backend.vercel.app/api/v1/user/get/$mongoId';
+        final response = await http.get(Uri.parse(url));
+        if (response.statusCode == 200) {
+          final data = json.decode(response.body);
+          log("Data on Profile Refresh:- $data");
+          if (data['user'] != null) {
+            if (mounted) {
+              Provider.of<ProfileDataProvider>(
+                context,
+                listen: false,
+              ).updateFromUserJson(data['user']);
+            }
+          }
+        } else {
+          print('Failed to fetch user: ${response.statusCode}');
+        }
+      }
+    } catch (e, stack) {
+      print('Error in _refreshProfileData: $e');
+      print(stack);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildHeader(context),
-            SizedBox(height: 20),
-            _buildProfileCompletionStatus(context),
-            SizedBox(height: 20),
-            _buildProfileCard(context),
-            SizedBox(height: 24),
-            _buildQuickStats(context),
-            SizedBox(height: 24),
-            _buildHealthMetrics(context),
-            SizedBox(height: 24),
-            _buildWorkoutProgress(context),
-            SizedBox(height: 24),
-            _buildSettingsSection(context),
-            SizedBox(height: 40),
-          ],
+    final profile = Provider.of<ProfileDataProvider>(context, listen: true);
+    return Container(
+      color: Theme.of(context).colorScheme.background,
+      child: RefreshIndicator(
+        onRefresh: _refreshProfileData,
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildHeader(context),
+                SizedBox(height: 20),
+                // _buildProfileCompletionStatus(context),
+                // SizedBox(height: 20),
+                // Enhanced Profile Image Block
+                Center(
+                  child: Stack(
+                    children: [
+                      // Gradient border
+                      Container(
+                        width: 110,
+                        height: 110,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          gradient: LinearGradient(
+                            colors: [
+                              Theme.of(context).colorScheme.primary,
+                              Theme.of(context).colorScheme.secondary,
+                            ],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.primary.withOpacity(0.18),
+                              blurRadius: 18,
+                              offset: Offset(0, 8),
+                            ),
+                          ],
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(4.0),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Theme.of(context).colorScheme.background,
+                            ),
+                            child: ClipOval(
+                              child: Image.network(
+                                'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&fit=crop&crop=face',
+                                width: 100,
+                                height: 100,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Icon(
+                                    Icons.person,
+                                    size: 100,
+                                    color: Colors.grey,
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      // Edit icon
+                      Positioned(
+                        bottom: 8,
+                        right: 8,
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => EditProfileScreen(),
+                              ),
+                            );
+                          },
+                          child: Container(
+                            padding: EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              gradient: LinearGradient(
+                                colors: [
+                                  Theme.of(context).colorScheme.primary,
+                                  Theme.of(context).colorScheme.secondary,
+                                ],
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.primary.withOpacity(0.18),
+                                  blurRadius: 8,
+                                  offset: Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Icon(
+                              Icons.edit,
+                              color: Theme.of(context).colorScheme.onPrimary,
+                              size: 18,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 24),
+                // Personal Info Card
+                _ProfileSectionCard(
+                  title: 'Personal Info',
+                  icon: Icons.person,
+                  children: [
+                    _ProfileInfoRow(
+                      label: 'Name',
+                      value: profile.fullName ?? 'No Name',
+                      icon: Icons.person_outline,
+                    ),
+                    _ProfileInfoRow(
+                      label: 'Email',
+                      value: profile.email ?? 'No Email',
+                      icon: Icons.email_outlined,
+                    ),
+                    _ProfileInfoRow(
+                      label: 'Phone',
+                      value: profile.phoneNumber ?? 'No Phone',
+                      icon: Icons.phone_outlined,
+                    ),
+                    _ProfileInfoRow(
+                      label: 'Gender',
+                      value: profile.gender ?? 'Not specified',
+                      icon: Icons.male,
+                    ),
+                    _ProfileInfoRow(
+                      label: 'Age',
+                      value: profile.age?.toString(),
+                      icon: Icons.cake_outlined,
+                    ),
+                  ],
+                ),
+                SizedBox(height: 16),
+                // Addresses Card
+                _ProfileSectionCard(
+                  title: 'Addresses',
+                  icon: Icons.location_on,
+                  children: [
+                    _ProfileInfoRow(
+                      label: 'Home',
+                      value: profile.homeAddress,
+                      icon: Icons.home_outlined,
+                    ),
+                    _ProfileInfoRow(
+                      label: 'Office',
+                      value: profile.officeAddress,
+                      icon: Icons.business_outlined,
+                    ),
+                    _ProfileInfoRow(
+                      label: 'College',
+                      value: profile.collegeAddress,
+                      icon: Icons.school_outlined,
+                    ),
+                  ],
+                ),
+                SizedBox(height: 16),
+                // Health Card
+                _ProfileSectionCard(
+                  title: 'Health',
+                  icon: Icons.monitor_heart,
+                  children: [
+                    _ProfileInfoRow(
+                      label: 'Height',
+                      value: profile.height != null
+                          ? '${profile.height} cm'
+                          : null,
+                      icon: Icons.height,
+                    ),
+                    _ProfileInfoRow(
+                      label: 'Weight',
+                      value: profile.weight != null
+                          ? '${profile.weight} kg'
+                          : null,
+                      icon: Icons.monitor_weight,
+                    ),
+                  ],
+                ),
+                SizedBox(height: 16),
+                // Preferences Card
+                _ProfileSectionCard(
+                  title: 'Preferences',
+                  icon: Icons.tune,
+                  children: [
+                    if (profile.dietaryPreference != null &&
+                        profile.dietaryPreference!.isNotEmpty)
+                      _ProfileChipsRow(
+                        label: 'Diet',
+                        values: profile.dietaryPreference!,
+                      ),
+                    if (profile.allergies.isNotEmpty)
+                      _ProfileChipsRow(
+                        label: 'Allergies',
+                        values: profile.allergies,
+                      ),
+                    _ProfileInfoRow(
+                      label: 'Activity Level',
+                      value: profile.activityLevel,
+                      icon: Icons.directions_run,
+                    ),
+                    _ProfileInfoRow(
+                      label: 'Fitness Goal',
+                      value: profile.goal,
+                      icon: Icons.flag_outlined,
+                    ),
+                  ],
+                ),
+                SizedBox(height: 16),
+                // Meal Plan Card
+                _ProfileSectionCard(
+                  title: 'Meal Plan',
+                  icon: Icons.restaurant,
+                  children: [
+                    _ProfileInfoRow(
+                      label: 'Meals per Day',
+                      value: profile.mealsPerDay?.toString(),
+                      icon: Icons.fastfood_outlined,
+                    ),
+                    if (profile.selectedMealTypes.isNotEmpty)
+                      _ProfileChipsRow(
+                        label: 'Meal Types',
+                        values: profile.selectedMealTypes,
+                      ),
+                    _ProfileInfoRow(
+                      label: 'Number of Days',
+                      value: profile.planDuration?.toString(),
+                      icon: Icons.calendar_today_outlined,
+                    ),
+                    if (profile.mealPlanType != null)
+                      _ProfileChipsRow(
+                        label: 'Meal Duration',
+                        values: [profile.mealPlanType!],
+                      ),
+                  ],
+                ),
+                SizedBox(height: 24),
+                // _buildSettingsSection(context),
+                // SizedBox(height: 40),
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -854,6 +1131,192 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+// --- Enhanced Helper Widgets for new UI ---
+
+class _ProfileSectionCard extends StatelessWidget {
+  final String title;
+  final IconData icon;
+  final List<Widget> children;
+  const _ProfileSectionCard({
+    required this.title,
+    required this.icon,
+    required this.children,
+  });
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(20),
+      margin: EdgeInsets.zero,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Theme.of(context).colorScheme.primary.withOpacity(0.13),
+            Theme.of(context).colorScheme.secondary.withOpacity(0.10),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(22),
+        boxShadow: [
+          BoxShadow(
+            color: Theme.of(context).colorScheme.primary.withOpacity(0.09),
+            blurRadius: 14,
+            offset: Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                icon,
+                color: Theme.of(context).colorScheme.primary,
+                size: 22,
+              ),
+              SizedBox(width: 8),
+              Text(
+                title,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 17,
+                  color: Theme.of(context).colorScheme.onBackground,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 10),
+          ..._addDividers(children),
+        ],
+      ),
+    );
+  }
+
+  List<Widget> _addDividers(List<Widget> children) {
+    final List<Widget> result = [];
+    for (int i = 0; i < children.length; i++) {
+      if (i > 0) {
+        result.add(Divider(height: 18, thickness: 0.7));
+      }
+      result.add(children[i]);
+    }
+    return result;
+  }
+}
+
+class _ProfileInfoRow extends StatelessWidget {
+  final String label;
+  final String? value;
+  final IconData? icon;
+  const _ProfileInfoRow({required this.label, required this.value, this.icon});
+  @override
+  Widget build(BuildContext context) {
+    if (value == null || value!.isEmpty) return SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Row(
+        children: [
+          if (icon != null) ...[
+            Icon(
+              icon,
+              size: 18,
+              color: Theme.of(context).colorScheme.primary.withOpacity(0.8),
+            ),
+            SizedBox(width: 8),
+          ],
+          Text(
+            '$label:',
+            style: TextStyle(
+              fontWeight: FontWeight.w500,
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
+            ),
+          ),
+          SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              value!,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface,
+                fontWeight: FontWeight.w400,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ProfileChipsRow extends StatelessWidget {
+  final String label;
+  final List<String> values;
+  const _ProfileChipsRow({required this.label, required this.values});
+  @override
+  Widget build(BuildContext context) {
+    if (values.isEmpty) return SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(
+            Icons.label_important_outline,
+            size: 16,
+            color: Theme.of(context).colorScheme.primary.withOpacity(0.7),
+          ),
+          SizedBox(width: 6),
+          Text(
+            '$label:',
+            style: TextStyle(
+              fontWeight: FontWeight.w500,
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
+            ),
+          ),
+          SizedBox(width: 10),
+          Expanded(
+            child: Wrap(
+              spacing: 7,
+              runSpacing: 5,
+              children: values
+                  .map(
+                    (v) => Chip(
+                      label: Text(
+                        v,
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      backgroundColor: Theme.of(
+                        context,
+                      ).colorScheme.primary.withOpacity(0.15),
+                      labelStyle: TextStyle(
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                      shape: StadiumBorder(
+                        side: BorderSide(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.primary.withOpacity(0.25),
+                        ),
+                      ),
+                      elevation: 1,
+                      shadowColor: Theme.of(
+                        context,
+                      ).colorScheme.primary.withOpacity(0.10),
+                    ),
+                  )
+                  .toList(),
+            ),
+          ),
+        ],
       ),
     );
   }

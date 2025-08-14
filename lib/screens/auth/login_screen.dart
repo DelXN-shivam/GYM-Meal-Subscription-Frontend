@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:gym_app_user_1/config/routes.dart';
 import 'package:provider/provider.dart';
+import 'package:gym_app_user_1/providers/profile_data_provider.dart';
 import 'package:gym_app_user_1/services/local_storage_service.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
@@ -35,6 +36,35 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
+  // Future<void> setData() async {
+  //   log("Call to set data in login");
+  //   final profileProvider = Provider.of<ProfileDataProvider>(
+  //     context,
+  //     listen: false,
+  //   );
+  //   // Fetch user data from API and update profile provider
+  //   final localStorage = LocalStorageService();
+  //   final mongoId = await localStorage.getMongoId();
+  //   if (mongoId != null && mongoId.isNotEmpty) {
+  //     log("fetching URL");
+  //     final url =
+  //         'https://gym-meal-subscription-backend.vercel.app/api/v1/user/get/$mongoId';
+  //     try {
+  //       final response = await http.get(Uri.parse(url));
+  //       if (response.statusCode == 200) {
+  //         final data = json.decode(response.body);
+  //         if (data['user'] != null) {
+  //           log("Data filling in profile provider");
+  //           profileProvider.updateFromUserJson(data['user']);
+  //           log("Data field in profile provider");
+  //         }
+  //       }
+  //     } catch (e) {
+  //       // Handle error (optional: show error or log)
+  //     }
+  //   }
+  // }
+
   Future<void> _login() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -43,6 +73,10 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() {
       _errorMessage = null;
     });
+    // final profileProvider = Provider.of<ProfileDataProvider>(
+    //   context,
+    //   listen: false,
+    // );
 
     try {
       log('Starting Firebase authentication...');
@@ -58,7 +92,6 @@ class _LoginScreenState extends State<LoginScreen> {
       final backendResponse = await http.post(
         Uri.parse(
           'https://gym-meal-subscription-backend.vercel.app/api/v1/auth/login',
-          // 'https://localhost:3500/api/v1/auth/login',
         ),
         headers: {
           'Content-Type': 'application/json',
@@ -77,13 +110,43 @@ class _LoginScreenState extends State<LoginScreen> {
         final responseData = json.decode(backendResponse.body);
         log("Decoded Data: $responseData");
         log('Backend authentication successful, storing user data...');
-        log(backendResponse.body);
+        log("Storing data in Profile provider");
+        // if (responseData['user'] != null) {
+        // profileProvider.updateFromUserJson(responseData['user']);
+        // }
 
         // Store user data in auth provider
         await authProvider.setUserData(
+          context: context,
           firebaseUser: userCredential.user!,
           backendUserData: responseData['data']['user'],
         );
+
+        // Fetch and update profile data from backend before navigating to home
+        try {
+          final localStorage = LocalStorageService();
+          final mongoId = await localStorage.getMongoId();
+          if (mongoId != null && mongoId.isNotEmpty) {
+            final url =
+                'https://gym-meal-subscription-backend.vercel.app/api/v1/user/get/$mongoId';
+            final response = await http.get(Uri.parse(url));
+            if (response.statusCode == 200) {
+              final data = json.decode(response.body);
+              if (data['user'] != null) {
+                Provider.of<ProfileDataProvider>(
+                  context,
+                  listen: false,
+                ).updateFromUserJson(data['user']);
+              }
+            } else {
+              print('Failed to fetch user: $response.statusCode');
+            }
+          }
+        } catch (e) {
+          print('Error in profile refresh after login: $e');
+        }
+
+        // await setData();
 
         // Navigate to next page
         Navigator.pushReplacementNamed(context, AppRoutes.home);
@@ -114,12 +177,12 @@ class _LoginScreenState extends State<LoginScreen> {
 
             // Store user data in auth provider
             await authProvider.setUserData(
+              context: context,
               firebaseUser: userCredential.user!,
               backendUserData: responseData['data']['user'],
             );
-
             // Navigate to next page
-            Navigator.pushReplacementNamed(context, AppRoutes.next);
+            Navigator.pushReplacementNamed(context, AppRoutes.home);
             log('Navigation completed');
           } else {
             throw Exception(

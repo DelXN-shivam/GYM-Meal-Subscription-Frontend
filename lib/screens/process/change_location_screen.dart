@@ -39,6 +39,21 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
   bool notifyBeforeDelivery = true;
 
   @override
+  void initState() {
+    super.initState();
+    final profileProvider = Provider.of<ProfileDataProvider>(
+      context,
+      listen: false,
+    );
+    if (profileProvider.defaultDeliveryAddress != null)
+      selectedDefaultAddress = profileProvider.defaultDeliveryAddress;
+    if (profileProvider.currentLocation != null)
+      selectedDeliveryLocation = profileProvider.currentLocation;
+    if (profileProvider.customAddress != null)
+      customAddressController.text = profileProvider.customAddress!;
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(0xFFF8F9FA),

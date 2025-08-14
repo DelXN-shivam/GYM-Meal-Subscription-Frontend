@@ -77,7 +77,7 @@ class _SampleMealScreenState extends State<SampleMealScreen> {
         goal = profileProvider.goal;
       });
 
-      final backendResponse = await http.post(
+      final calculateCaloriesResponse = await http.post(
         Uri.parse(
           'https://gym-meal-subscription-backend.vercel.app/api/v1/user/calculate-calories',
         ),
@@ -86,6 +86,7 @@ class _SampleMealScreenState extends State<SampleMealScreen> {
           'Accept': 'application/json',
         },
         body: json.encode({
+          "userId": widget.mongoId,
           "gender": profileProvider.gender?.toLowerCase(),
           "weight": profileProvider.weight,
           "height": profileProvider.height,
@@ -94,27 +95,81 @@ class _SampleMealScreenState extends State<SampleMealScreen> {
           "goal": profileProvider.goal?.toLowerCase(),
         }),
       );
-      log('Update response status: ${backendResponse.statusCode}');
-      log('Update response body: ${backendResponse.body}');
-      if (backendResponse.statusCode == 200 ||
-          backendResponse.statusCode == 201) {
-        final responseData = json.decode(backendResponse.body);
+      log(
+        'calculate-calories response status: ${calculateCaloriesResponse.statusCode}',
+      );
+      log(
+        'calculate-calories response body: ${calculateCaloriesResponse.body}',
+      );
+
+      final suggestedProductsResponse = await http.post(
+        Uri.parse(
+          'https://gym-meal-subscription-backend.vercel.app/api/v1/product/suggest/?dietaryPreference=veg,non-veg&allergies=nuts,gluten&userId=685d3083b7c031187fb3503c',
+        ),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: json.encode({
+          "userId": widget.mongoId,
+          "gender": profileProvider.gender?.toLowerCase(),
+          "weight": profileProvider.weight,
+          "height": profileProvider.height,
+          "age": profileProvider.age,
+          "activityLevel": profileProvider.activityLevel?.toLowerCase(),
+          "goal": profileProvider.goal?.toLowerCase(),
+        }),
+      );
+
+      if (calculateCaloriesResponse.statusCode == 200 ||
+          calculateCaloriesResponse.statusCode == 201) {
+        final responseData = json.decode(calculateCaloriesResponse.body);
         log("Decoded Data: $responseData");
 
         // Update state with response data
         setState(() {
-          calories = responseData['recommendedCalories'] ?? 0;
-          bmiValue = double.parse(responseData['bmi'] ?? "0");
-          bmr = responseData['bmr'] ?? 0;
-          tdee = responseData['tdee'] ?? 0;
+          calories = responseData['nutrients']['recommendedCalories'] ?? 0;
+          bmiValue = responseData['nutrients']['bmi'] ?? 0;
+          bmr = responseData['nutrients']['bmr'] ?? 0;
+          tdee = responseData['nutrients']['tdee'] ?? 0;
 
           // Update macronutrients
-          if (responseData['macronutients'] != null) {
-            proteinPercent = responseData['macronutients']['protein'] ?? 0;
-            carbsPercent = responseData['macronutients']['carbs'] ?? 0;
-            fatsPercent = responseData['macronutients']['fats'] ?? 0;
+          if (responseData['nutrients']['macroNutrients'] != null) {
+            proteinPercent =
+                responseData['nutrients']['macroNutrients']['protein'] ?? 0;
+            carbsPercent =
+                responseData['nutrients']['macroNutrients']['carbs'] ?? 0;
+            fatsPercent =
+                responseData['nutrients']['macroNutrients']['fats'] ?? 0;
           }
         });
+
+        // Store nutrition and health data in ProfileDataProvider
+        final profileProvider = Provider.of<ProfileDataProvider>(
+          context,
+          listen: false,
+        );
+        profileProvider.updateNutritionAndHealth(
+          bmr: (responseData['nutrients']['bmr'] as num?)?.toDouble() ?? 0.0,
+          tdee: (responseData['nutrients']['tdee'] as num?)?.toDouble() ?? 0.0,
+          recommendedCalories:
+              (responseData['nutrients']['recommendedCalories'] as num?)
+                  ?.toDouble() ??
+              0.0,
+          bmi: (responseData['nutrients']['bmi'] as num?)?.toDouble() ?? 0.0,
+          protein:
+              (responseData['nutrients']['macroNutrients']?['protein'] as num?)
+                  ?.toDouble() ??
+              0.0,
+          carbs:
+              (responseData['nutrients']['macroNutrients']?['carbs'] as num?)
+                  ?.toDouble() ??
+              0.0,
+          fats:
+              (responseData['nutrients']['macroNutrients']?['fats'] as num?)
+                  ?.toDouble() ??
+              0.0,
+        );
 
         log('Update successful, storing user data...');
       } else {
@@ -138,6 +193,16 @@ class _SampleMealScreenState extends State<SampleMealScreen> {
 
   @override
   void initState() {
+    final profileProvider = Provider.of<ProfileDataProvider>(
+      context,
+      listen: false,
+    );
+    age = profileProvider.age;
+    gender = profileProvider.gender;
+    height = profileProvider.height;
+    weight = profileProvider.weight;
+    activity = profileProvider.activityLevel;
+    goal = profileProvider.goal;
     fetchCaloriesData();
     super.initState();
   }

@@ -4,7 +4,6 @@ import 'package:gym_app_user_1/screens/process/sample_meal_screen.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:gym_app_user_1/config/routes.dart';
 import 'package:provider/provider.dart';
 import 'package:gym_app_user_1/providers/profile_data_provider.dart';
 
@@ -96,15 +95,28 @@ class _SetPreferencesScreenState extends State<SetPreferencesScreen> {
       if (widget.mongoId.isEmpty) {
         throw Exception('User ID not found. Please try again.');
       }
-      final backendResponse = await http.put(
+      log("MONGO ID from previous page :- ${widget.mongoId}");
+      // final backendResponse = await http.patch(
+      //   Uri.parse(
+      //     'https://gym-meal-subscription-backend.vercel.app/api/v1/user/update/${widget.mongoId}',
+      //   ),
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //     'Accept': 'application/json',
+      //   },
+      //   body: json.encode({
+      //     "fitnessGoal": selectedGoal,
+      //     "activityLevel": selectedActivityLevel,
+      //     "dietPreference": selectedDiet.toList(),
+      //     "allergy": selectedAllergies.toList(),
+      //   }),
+      // );
+      final backendResponse = await http.patch(
         Uri.parse(
           'https://gym-meal-subscription-backend.vercel.app/api/v1/user/update/${widget.mongoId}',
         ),
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-        body: json.encode({
+        headers: {"Content-Type": 'application/json'},
+        body: jsonEncode({
           "fitnessGoal": selectedGoal,
           "activityLevel": selectedActivityLevel,
           "dietPreference": selectedDiet.toList(),
@@ -188,6 +200,18 @@ class _SetPreferencesScreenState extends State<SetPreferencesScreen> {
   void initState() {
     super.initState();
     log("&&&&&&&  ${widget.mongoId}  &&&&&&&");
+    final profileProvider = Provider.of<ProfileDataProvider>(
+      context,
+      listen: false,
+    );
+    if (profileProvider.goal != null) selectedGoal = profileProvider.goal;
+    if (profileProvider.activityLevel != null)
+      selectedActivityLevel = profileProvider.activityLevel!;
+    if (profileProvider.dietaryPreference != null &&
+        profileProvider.dietaryPreference!.isNotEmpty)
+      selectedDiet = profileProvider.dietaryPreference!.toSet();
+    if (profileProvider.allergies.isNotEmpty)
+      selectedAllergies = profileProvider.allergies.toSet();
   }
 
   @override

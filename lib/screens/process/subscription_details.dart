@@ -50,6 +50,39 @@ class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
   // Custom address
   TextEditingController customAddressController = TextEditingController();
 
+  @override
+  void initState() {
+    super.initState();
+    final profileProvider = Provider.of<ProfileDataProvider>(
+      context,
+      listen: false,
+    );
+    if (profileProvider.planDuration != null)
+      selectedPlanDuration = profileProvider.planDuration;
+    if (profileProvider.mealsPerDay != null)
+      selectedMealsPerDay = profileProvider.mealsPerDay;
+    if (profileProvider.selectedMealTypes.isNotEmpty)
+      selectedMealTypes = profileProvider.selectedMealTypes.toSet();
+    if (profileProvider.planLength != null)
+      selectedPlanDuration = profileProvider.planLength;
+    if (profileProvider.startDate != null)
+      selectedDate = profileProvider.startDate;
+    if (profileProvider.defaultDeliveryAddress != null)
+      selectedDefaultAddress = profileProvider.defaultDeliveryAddress;
+    if (profileProvider.customAddress != null)
+      customAddressController.text = profileProvider.customAddress!;
+    // Set selectedDuration from provider if available
+    if (profileProvider.mealPlanType != null &&
+        durations.contains(
+          profileProvider.mealPlanType!.substring(0, 1).toUpperCase() +
+              profileProvider.mealPlanType!.substring(1).toLowerCase(),
+        )) {
+      selectedDuration =
+          profileProvider.mealPlanType!.substring(0, 1).toUpperCase() +
+          profileProvider.mealPlanType!.substring(1).toLowerCase();
+    }
+  }
+
   Future<void> _handleContinue() async {
     // Validate selections
     if (selectedDuration == null) {
@@ -92,7 +125,7 @@ class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
       if (widget.mongoId.isEmpty) {
         throw Exception('User ID not found. Please try again.');
       }
-      final backendResponse = await http.put(
+      final backendResponse = await http.patch(
         Uri.parse(
           'https://gym-meal-subscription-backend.vercel.app/api/v1/user/update/${widget.mongoId}',
         ),

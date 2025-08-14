@@ -15,49 +15,77 @@ class LocalStorageService {
     required String mongoEmail,
     // Add more parameters for other user data
   }) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_loggedInKey, true);
-    await prefs.setString(_userIdKey, userId);
-    await prefs.setString(_usernameKey, username);
-    await prefs.setString(_mongoIdKey, mongoId);
-    await prefs.setString(_mongoEmailKey, mongoEmail);
-    // Save other user data
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool(_loggedInKey, true);
+      await prefs.setString(_userIdKey, userId);
+      await prefs.setString(_usernameKey, username);
+      await prefs.setString(_mongoIdKey, mongoId);
+      await prefs.setString(_mongoEmailKey, mongoEmail);
+      // Save other user data
+    } catch (e) {
+      // Optionally log error
+    }
   }
 
   Future<bool> isLoggedIn() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getBool(_loggedInKey) ?? false;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      return prefs.getBool(_loggedInKey) ?? false;
+    } catch (e) {
+      return false;
+    }
   }
 
   Future<String?> getUserId() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString(_userIdKey);
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      return prefs.getString(_userIdKey);
+    } catch (e) {
+      return null;
+    }
   }
 
   Future<String?> getUsername() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString(_usernameKey);
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      return prefs.getString(_usernameKey);
+    } catch (e) {
+      return null;
+    }
   }
 
   Future<String?> getMongoId() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString(_mongoIdKey);
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      return prefs.getString(_mongoIdKey);
+    } catch (e) {
+      return null;
+    }
   }
 
   Future<String?> getMongoEmail() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString(_mongoEmailKey);
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      return prefs.getString(_mongoEmailKey);
+    } catch (e) {
+      return null;
+    }
   }
 
   // Add more methods to retrieve other user data
 
   Future<void> clearLoginData() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove(_loggedInKey);
-    await prefs.remove(_userIdKey);
-    await prefs.remove(_usernameKey);
-    await prefs.remove(_mongoIdKey);
-    await prefs.remove(_mongoEmailKey);
-    // Remove other user data keys
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove(_loggedInKey);
+      await prefs.remove(_userIdKey);
+      await prefs.remove(_usernameKey);
+      await prefs.remove(_mongoIdKey);
+      await prefs.remove(_mongoEmailKey);
+      // Remove other user data keys
+    } catch (e) {
+      // Optionally log error
+    }
   }
 }

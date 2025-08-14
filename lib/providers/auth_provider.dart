@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'dart:developer';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:gym_app_user_1/services/local_storage_service.dart';
@@ -58,6 +60,7 @@ class AuthProvider with ChangeNotifier {
 
   // Set user data after successful login
   Future<void> setUserData({
+    required context,
     required User firebaseUser,
     required Map<String, dynamic> backendUserData,
   }) async {
@@ -66,7 +69,6 @@ class AuthProvider with ChangeNotifier {
 
     // Log the backend user data for debugging
     log("Backend User Data: $backendUserData");
-
     // Save login data to local storage
     await _localStorageService.saveLoginData(
       userId: firebaseUser.uid,

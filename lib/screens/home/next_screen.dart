@@ -1,9 +1,8 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:gym_app_user_1/providers/auth_provider.dart';
-import 'package:gym_app_user_1/services/local_storage_service.dart'; // Ensure this import is correct
+import 'package:gym_app_user_1/providers/profile_data_provider.dart';
+import 'package:gym_app_user_1/services/local_storage_service.dart';
 
 class NextPage extends StatefulWidget {
   const NextPage({Key? key}) : super(key: key);
@@ -75,7 +74,12 @@ class _NextPageState extends State<NextPage> {
       if (shouldLogout == true) {
         // Get the auth provider and call logout
         final authProvider = Provider.of<AuthProvider>(context, listen: false);
+        final profileProvider = Provider.of<ProfileDataProvider>(
+          context,
+          listen: false,
+        );
         await authProvider.logout();
+        profileProvider.clearAllData();
 
         // Navigate back to login screen
         if (mounted) {
